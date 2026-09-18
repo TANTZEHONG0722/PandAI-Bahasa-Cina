@@ -17,10 +17,19 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         
         .glass-panel { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
+        
+        /* 🌟 修复后的高颜值侧边栏按钮 CSS */
         .nav-btn { transition: all 0.3s; border: 2px solid transparent; }
-        .nav-btn.active { background: #4f46e5; color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); transform: translateY(-2px); }
-        .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); }
-        .nav-btn.active .icon-box { background: linear-gradient(135deg, #6366f1, #4f46e5); border: 1px solid #818cf8; }
+        .nav-btn.active { 
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.85), rgba(124, 58, 237, 0.85)); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); 
+            transform: translateY(-2px); 
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
+        .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
         .bounce-slow { animation: bounceSlow 3s infinite alternate ease-in-out; }
         @keyframes bounceSlow { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
         .quiz-btn { background: rgba(255,255,255,0.9); border: 2px solid #e2e8f0; font-size: 1.1rem; font-weight: bold; padding: 1rem; border-radius: 12px; transition: all 0.1s; cursor: pointer; }
@@ -36,7 +45,6 @@
         .recording-pulse { animation: pulse-ring 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-        /* 3D 翻转记忆卡 CSS */
         .flashcard { perspective: 1000px; cursor: pointer; width: 100%; max-width: 320px; height: 350px; margin: 0 auto; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
         .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
@@ -244,6 +252,19 @@
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 drop-shadow-sm">📊 教师数据大屏</h2>
                     <div class="flex gap-2">
                         <button onclick="window.fetchLeaderboard()" class="bg-white/80 hover:bg-white text-indigo-600 px-3 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-1 border border-indigo-200">🔄 刷新状态</button>
+                        <button onclick="generateAIQuiz()" class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md transition-colors flex items-center gap-1 border border-indigo-300">✨ AI 一键出题</button>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-indigo-500/90 to-purple-600/90 rounded-2xl p-5 mb-6 shadow-lg border border-white/20 text-white flex flex-col md:flex-row justify-between items-center gap-4 backdrop-blur-md">
+                    <div class="text-center md:text-left">
+                        <h3 class="font-bold text-lg drop-shadow-sm flex items-center justify-center md:justify-start gap-2">🗄️ 数据库实时用户总量</h3>
+                        <p class="text-indigo-100 text-sm mt-1">实时拉取自 Firebase Cloud Firestore</p>
+                    </div>
+                    <div class="flex gap-4 md:gap-6 text-center">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-total">...</div><div class="text-xs text-indigo-100 font-bold mt-1">总计账号</div></div>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-students">...</div><div class="text-xs text-indigo-100 font-bold mt-1">学生 (m-)</div></div>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-teachers">...</div><div class="text-xs text-indigo-100 font-bold mt-1">教师 (g-)</div></div>
                     </div>
                 </div>
                 
@@ -290,7 +311,6 @@
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
-        // --- 🌟 原生 AI 语音朗读引擎 (Text-to-Speech) ---
         window.speakText = (text) => {
             if(!window.speechSynthesis) return Swal.fire('不支持', '浏览器不支持语音朗读功能', 'error');
             const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/BM:.*$/i, ''); 
@@ -299,7 +319,6 @@
             window.speechSynthesis.speak(utterance);
         };
 
-        // --- 🌟 翻转记忆卡组数据与逻辑 ---
         const flashcardsData = [ { zh: '学校', py: 'xué xiào', ms: 'Sekolah' }, { zh: '老师', py: 'lǎo shī', ms: 'Cikgu / Guru' }, { zh: '朋友', py: 'péng yǒu', ms: 'Kawan' }, { zh: '学习', py: 'xué xí', ms: 'Belajar' }, { zh: '马来西亚', py: 'mǎ lái xī yà', ms: 'Malaysia' } ];
         let currentCardIdx = 0;
         
@@ -313,7 +332,7 @@
         window.flipFlashcard = () => { document.getElementById('fc-card').classList.toggle('flipped'); playSound('click'); };
         window.nextFlashcard = () => { currentCardIdx = (currentCardIdx + 1) % flashcardsData.length; loadFlashcard(); playSound('click'); };
         window.prevFlashcard = () => { currentCardIdx = (currentCardIdx - 1 + flashcardsData.length) % flashcardsData.length; loadFlashcard(); playSound('click'); };
-        loadFlashcard(); // Init
+        loadFlashcard();
 
         async function initAudio() {
             if (isAudioInit) return; await Tone.start(); Tone.Destination.mute = false;
@@ -346,8 +365,9 @@
             allowedIndices.forEach(i => {
                 const navItem = navIcons[i]; const title = langData.zh.nav[i]; 
                 const btn = document.createElement('button');
-                btn.setAttribute('data-target', navItem.id); // 🌟 核心修复点：为按钮绑定目标视图标识
-                btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-2 hover:bg-white/40`;
+                btn.setAttribute('data-target', navItem.id); 
+                // 🌟 修复：移除 md:flex-1，使用 md:flex-none，避免在电脑端被过度拉伸
+                btn.className = `nav-btn flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-2 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-3 hover:bg-white/70 transition-all`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
                 
                 btn.onclick = () => { 
@@ -364,14 +384,12 @@
         window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } };
         
         window.switchView = (viewId) => { 
-            // 🌟 核心修复点：安全切换类名，绝不再销毁和重建底部导航栏的 DOM！
             ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.classList.add('hidden');
             }); 
             const targetEl = document.getElementById(`view-${viewId}`);
             if(targetEl) targetEl.classList.remove('hidden'); 
             
-            // 安全更新导航栏高亮状态
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if (btn.getAttribute('data-target') === viewId) btn.classList.add('active');
                 else btn.classList.remove('active');
@@ -469,6 +487,22 @@
             const container = document.getElementById('leaderboard-container'); const teacherTable = document.getElementById('teacher-table-body');
             if(container) container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">正在拉取云端数据...</div>';
             try {
+                // 🌟 新增：数据库实时统计大盘数据 (仅教师执行)
+                if (window.selectedRole === 'teacher') {
+                    const allUsersSnap = await getDocs(collection(db, "users"));
+                    let total = 0, students = 0, teachers = 0;
+                    allUsersSnap.forEach(doc => {
+                        total++;
+                        if(doc.data().role === 'student') students++;
+                        else if(doc.data().role === 'teacher') teachers++;
+                    });
+                    if(document.getElementById('stat-total')) {
+                        document.getElementById('stat-total').innerText = total;
+                        document.getElementById('stat-students').innerText = students;
+                        document.getElementById('stat-teachers').innerText = teachers;
+                    }
+                }
+
                 const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20)); const querySnapshot = await getDocs(q); 
                 let html = ''; let teacherHtml = ''; let rank = 1;
                 
