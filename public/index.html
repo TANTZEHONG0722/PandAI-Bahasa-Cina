@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>智学华文 PandAI Bahasa Cina</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,7 +12,7 @@
         body, html { height: 100%; margin: 0; background: linear-gradient(135deg, #f8fafc, #e2e8f0); color: #1e293b; font-family: 'STKaiti', '楷体', serif !important; overflow: hidden; }
         * { font-family: inherit !important; }
         .scrollable-area { overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
@@ -21,136 +21,120 @@
         .icon-box { background: linear-gradient(135deg, #ffffff, #f1f5f9); box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 2px 5px rgba(0,0,0,0.1); }
         .nav-btn.active .icon-box { background: linear-gradient(135deg, #6366f1, #4f46e5); border: 1px solid #818cf8; }
         .bounce-slow { animation: bounceSlow 3s infinite alternate ease-in-out; }
-        @keyframes bounceSlow { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
-        .star-anim { position: absolute; font-size: 2.5rem; animation: starPop 0.8s forwards; z-index: 50; }
-        @keyframes starPop { 0% { transform: scale(0.5) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5) rotate(720deg); opacity: 0; } }
+        @keyframes bounceSlow { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+        .star-anim { position: absolute; font-size: 2rem; animation: starPop 0.8s forwards; z-index: 50; }
+        @keyframes starPop { 0% { transform: scale(0.5) rotate(0deg); opacity: 1; } 100% { transform: translateY(-80px) scale(1.5) rotate(720deg); opacity: 0; } }
         .pet-card { transition: all 0.3s; }
         .pet-card:hover { transform: scale(1.05); }
         .pet-glow { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6); border-color: #fbbf24; }
         .pet-locked { filter: brightness(0.2) grayscale(100%); opacity: 0.6; }
-        .quiz-btn { background: white; border: 3px solid #e2e8f0; font-size: 1.2rem; font-weight: bold; padding: 1.2rem; border-radius: 16px; transition: all 0.1s; cursor: pointer; }
+        .quiz-btn { background: white; border: 2px solid #e2e8f0; font-size: 1.1rem; font-weight: bold; padding: 1rem; border-radius: 12px; transition: all 0.1s; cursor: pointer; }
         .quiz-btn.correct { background: #22c55e; border-color: #16a34a; color: white;}
         .quiz-btn.wrong { background: #ef4444; border-color: #dc2626; color: white;}
-        .bubble { max-width: 85%; padding: 1rem 1.25rem; border-radius: 1.25rem; line-height: 1.6; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .bubble { max-width: 90%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.5; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .ai-msg .bubble { background: white; border: 2px solid #e2e8f0; border-bottom-left-radius: 0.25rem; color: #334155; }
         .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
     </style>
 </head>
 <body class="flex flex-col">
 
-    <header class="glass-panel z-20 flex-shrink-0 m-2 md:m-4 rounded-2xl shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl flex items-center justify-center text-3xl shadow-lg pb-1">🚀</div>
+    <header class="glass-panel z-20 flex-shrink-0 m-2 rounded-xl shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 h-16 md:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg md:rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg pb-1">🚀</div>
                 <div class="flex flex-col">
-                    <span class="text-xl md:text-2xl font-bold text-slate-800 tracking-wider">智学华文 PandAI Bahasa Cina</span>
-                    <span id="ui-subtitle" class="text-sm font-bold text-indigo-600">KSSR Semakan 互动学习平台</span>
+                    <span class="text-lg md:text-2xl font-bold text-slate-800 tracking-wider">PandAI Bahasa Cina</span>
+                    <span id="ui-subtitle" class="text-xs md:text-sm font-bold text-indigo-600">KSSR Semakan</span>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <select id="lang-select" onchange="changeLang(this.value)" class="bg-white border-2 border-slate-200 rounded-xl px-2 py-2 text-base font-bold outline-none cursor-pointer hover:bg-slate-50">
+            <div class="flex items-center gap-2">
+                <select id="lang-select" onchange="changeLang(this.value)" class="bg-white border-2 border-slate-200 rounded-lg px-1 md:px-2 py-1 md:py-2 text-sm md:text-base font-bold outline-none cursor-pointer">
                     <option value="zh">中文</option>
-                    <option value="ms">Bahasa Melayu</option>
-                    <option value="en">English</option>
+                    <option value="ms">BM</option>
+                    <option value="en">EN</option>
                 </select>
-                <button id="sound-toggle" onclick="toggleAudio()" class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 border-2 border-slate-200 text-2xl flex items-center justify-center text-slate-600 hover:bg-slate-200 pb-1">🔇</button>
+                <button onclick="toggleAudio()" class="w-8 h-8 md:w-12 md:h-12 rounded-lg bg-slate-100 border-2 border-slate-200 text-lg md:text-2xl flex items-center justify-center hover:bg-slate-200 pb-1"><span id="sound-icon">🔇</span></button>
             </div>
         </div>
     </header>
 
-    <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full px-2 md:px-4 pb-4 gap-4 min-h-0">
-        <nav class="glass-panel md:w-72 flex-shrink-0 scrollable-area rounded-2xl flex md:flex-col p-4 gap-3 shadow-lg" id="sidebar-nav"></nav>
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full px-2 md:px-4 pb-[80px] md:pb-4 gap-4 min-h-0 relative">
+        
+        <!-- 响应式导航：手机底部，电脑侧边 -->
+        <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 flex justify-around p-2 md:relative md:bg-transparent md:border-none md:w-72 md:flex-col md:p-4 md:gap-3 glass-panel md:rounded-2xl" id="sidebar-nav"></nav>
 
         <main class="flex-1 scrollable-area flex flex-col glass-panel rounded-2xl shadow-xl z-10 relative">
             
-            <!-- Dashboard -->
-            <div id="view-dashboard" class="flex-1 p-6 flex flex-col items-center justify-center min-h-[500px]">
-                <div class="bg-gradient-to-b from-indigo-50 to-white w-full max-w-2xl rounded-3xl p-8 border-2 border-indigo-100 shadow-sm relative overflow-hidden text-center">
-                    <span class="absolute top-4 right-4 bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-bold shadow-sm" id="pet-level-badge">Lv. 1</span>
-                    <h3 id="ui-pet-title" class="text-3xl font-bold text-slate-800 mb-2">我的学习萌宠</h3>
-                    
-                    <div class="flex flex-col items-center justify-center gap-2 mb-6">
+            <div id="view-dashboard" class="flex-1 p-4 md:p-6 flex flex-col items-center justify-center min-h-[400px]">
+                <div class="bg-gradient-to-b from-indigo-50 to-white w-full max-w-2xl rounded-3xl p-6 md:p-8 border-2 border-indigo-100 shadow-sm relative overflow-hidden text-center">
+                    <span class="absolute top-4 right-4 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm" id="pet-level-badge">Lv. 1</span>
+                    <h3 id="ui-pet-title" class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">我的学习萌宠</h3>
+                    <div class="flex flex-col items-center justify-center gap-2 mb-4">
                         <span class="text-sm font-bold text-slate-500" id="ui-xp-label">XP: <span id="xp-text" class="text-indigo-600">0/50</span></span>
-                        <div class="w-48 h-3 bg-slate-200 rounded-full overflow-hidden border border-slate-300">
+                        <div class="w-40 md:w-48 h-3 bg-slate-200 rounded-full overflow-hidden border border-slate-300">
                             <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-700" style="width: 0%"></div>
                         </div>
                     </div>
-
-                    <div class="text-8xl md:text-9xl my-4 bounce-slow cursor-pointer drop-shadow-xl" id="pet-emoji" onclick="playSound('jump')">🥚</div>
-                    <h4 id="pet-name" class="text-3xl font-bold text-indigo-600 mt-4">灵力蛋</h4>
-                    <p id="ui-pet-desc" class="text-slate-600 font-bold text-lg mt-2">完成答题任务，获取星星经验值让宠物进化吧！</p>
-                    <div class="mt-8 flex justify-center gap-4">
-                        <button onclick="switchView('quiz')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold text-xl shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">
-                            ▶️ <span id="ui-btn-start">开始今日任务</span>
-                        </button>
+                    <div class="text-7xl md:text-9xl my-4 bounce-slow cursor-pointer drop-shadow-xl" id="pet-emoji" onclick="playSound('jump')">🥚</div>
+                    <h4 id="pet-name" class="text-2xl md:text-3xl font-bold text-indigo-600 mt-2">灵力蛋</h4>
+                    <p id="ui-pet-desc" class="text-slate-600 font-bold text-sm md:text-lg mt-2">完成答题任务，获取星星经验值让宠物进化吧！</p>
+                    <div class="mt-6 flex justify-center">
+                        <button onclick="switchView('quiz')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 md:px-8 md:py-3 rounded-xl font-bold text-lg md:text-xl shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">▶️ <span id="ui-btn-start">开始今日任务</span></button>
                     </div>
                 </div>
             </div>
 
-            <!-- Quiz -->
-            <div id="view-quiz" class="hidden flex-1 p-6 bg-slate-50 relative min-h-[500px]">
-                <div class="absolute top-4 right-6 bg-white border-2 border-amber-400 px-4 py-2 rounded-xl text-amber-500 font-bold text-xl shadow-sm z-20">⭐ <span id="game-score">0</span></div>
-                <div class="w-full max-w-3xl mx-auto pt-12 pb-8 flex flex-col items-center">
-                    <div class="bg-white p-8 rounded-3xl mb-8 text-center relative w-full border-4 border-slate-200 shadow-md">
-                        <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-indigo-500 text-white font-bold text-lg px-6 py-1.5 rounded-full">
+            <div id="view-quiz" class="hidden flex-1 p-4 md:p-6 bg-slate-50 relative min-h-[400px]">
+                <div class="absolute top-4 right-4 bg-white border-2 border-amber-400 px-3 py-1 rounded-xl text-amber-500 font-bold text-lg shadow-sm z-20">⭐ <span id="game-score">0</span></div>
+                <div class="w-full max-w-3xl mx-auto pt-10 pb-6 flex flex-col items-center">
+                    <div class="bg-white p-6 rounded-3xl mb-6 text-center relative w-full border-4 border-slate-200 shadow-md">
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white font-bold text-sm md:text-lg px-4 py-1 rounded-full">
                             <span id="ui-q-prefix">第</span> <span id="q-num">1/5</span> <span id="ui-q-suffix">题</span>
                         </div>
-                        <h3 id="game-question" class="text-2xl md:text-3xl font-bold text-slate-800 mt-4 leading-relaxed">加载中...</h3>
+                        <h3 id="game-question" class="text-xl md:text-2xl font-bold text-slate-800 mt-4 leading-relaxed">加载中...</h3>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full" id="game-options"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full" id="game-options"></div>
                 </div>
             </div>
 
-            <!-- Live AI Tutor -->
             <div id="view-ai" class="hidden flex-1 flex flex-col bg-slate-50">
-                <div class="bg-white border-b-2 border-slate-200 py-3 px-4 text-center shadow-sm z-10 shrink-0">
-                    <span class="text-xl font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 <span id="ui-ai-title">万能 Gemini 学习助手</span></span>
-                    <span id="ui-ai-subtitle" class="text-sm font-bold text-slate-400">真实接入云端大脑，有问必答，拒绝预设</span>
+                <div class="bg-white border-b-2 border-slate-200 py-2 px-3 text-center shadow-sm z-10 shrink-0">
+                    <span class="text-lg md:text-xl font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 <span id="ui-ai-title">万能 Gemini 学习助手</span></span>
                 </div>
-                <div class="flex-1 scrollable-area p-4 flex flex-col gap-4" id="chat-messages">
-                    <div class="flex items-end gap-3 ai-msg">
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-xl shrink-0 border border-indigo-200 pb-1">🤖</div>
-                        <div class="bubble font-bold" id="ui-ai-intro">你好！我是连接了真实的云端大模型的 AI 学习伙伴。没有任何预设脚本，无论你问我关于课文、拼音、科学、常识，我都能游刃有余地回答你哦！💡 快来考考我吧！</div>
+                <div class="flex-1 scrollable-area p-3 md:p-4 flex flex-col gap-4" id="chat-messages">
+                    <div class="flex items-end gap-2 ai-msg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-lg md:text-xl shrink-0 border border-indigo-200 pb-1">🤖</div>
+                        <div class="bubble font-bold" id="ui-ai-intro">你好！我是真正的云端大模型，有问必答，快来考考我吧！💡</div>
                     </div>
                 </div>
-                <div class="bg-white px-4 pt-3 pb-2 border-t-2 border-slate-200 shrink-0 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div class="bg-white px-3 pt-2 pb-2 border-t-2 border-slate-200 shrink-0 overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <div class="flex gap-2" id="quick-prompts"></div>
                 </div>
-                <div class="p-4 bg-white border-t border-slate-100 shrink-0">
+                <div class="p-3 bg-white border-t border-slate-100 shrink-0">
                     <div class="flex bg-slate-50 rounded-xl border-2 border-slate-200 focus-within:border-indigo-500 transition-all p-1">
-                        <input type="text" id="user-input" class="flex-1 bg-transparent border-none outline-none text-slate-800 px-4 py-2 font-bold text-lg" placeholder="输入任何你想问的问题..." autocomplete="off">
-                        <button id="ui-btn-send" onclick="handleSend()" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-2 font-bold text-lg active:translate-y-1">发送</button>
+                        <input type="text" id="user-input" class="flex-1 bg-transparent border-none outline-none text-slate-800 px-3 py-1 font-bold text-base" placeholder="输入你想问的问题..." autocomplete="off">
+                        <button id="ui-btn-send" onclick="handleSend()" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-1.5 font-bold text-base active:translate-y-1">发送</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Teacher Data -->
-            <div id="view-teacher" class="hidden flex-1 p-6 bg-slate-50 scrollable-area">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">📊 <span id="ui-t-title">教师数据中心</span></h2>
-                </div>
-                <div class="bg-indigo-900 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
-                    <span class="absolute right-0 top-0 text-9xl opacity-10 -mt-4 -mr-4">🤖</span>
-                    <h3 class="text-xl font-bold mb-2" id="ui-t-insight-t">💡 班级整体学习概况</h3>
-                    <p class="text-indigo-200 text-base" id="ui-t-insight-d">点击下方每位学生的【生成 AI 分析】，系统将把该生数据发送给本地服务器，由真实 AI 生成专业的教学干预建议。</p>
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-slate-50 scrollable-area">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4">📊 <span id="ui-t-title">教师数据中心</span></h2>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left min-w-[600px]">
-                            <thead class="bg-slate-100 text-slate-600 text-base">
+                        <table class="w-full text-left min-w-[500px]">
+                            <thead class="bg-slate-100 text-slate-600 text-sm md:text-base">
                                 <tr>
-                                    <th class="p-4 font-bold" id="ui-th-1">学生姓名</th>
-                                    <th class="p-4 font-bold" id="ui-th-2">当前萌宠</th>
-                                    <th class="p-4 font-bold" id="ui-th-3">词汇掌握</th>
-                                    <th class="p-4 font-bold" id="ui-th-4">语法应用</th>
-                                    <th class="p-4 font-bold text-center" id="ui-th-5">操作</th>
+                                    <th class="p-3 font-bold" id="ui-th-1">学生姓名</th>
+                                    <th class="p-3 font-bold" id="ui-th-3">词汇</th>
+                                    <th class="p-3 font-bold" id="ui-th-4">语法</th>
+                                    <th class="p-3 font-bold text-center" id="ui-th-5">生成 AI 分析</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-base" id="teacher-table-body"></tbody>
+                            <tbody class="text-sm md:text-base" id="teacher-table-body"></tbody>
                         </table>
                     </div>
                 </div>
-                <div class="h-8"></div>
             </div>
         </main>
     </div>
@@ -158,60 +142,57 @@
     <script>
         const langData = {
             zh: {
-                nav: ['学习主页', '华文探索', '真实AI助手', '宠物图鉴', '教师数据'], sub: "KSSR Semakan 互动学习平台", xpLabel: "XP:", 
-                petTitle: "我的学习萌宠", petDesc: "完成答题任务，获取星星经验值让宠物进化吧！", btnStart: "开始今日任务",
-                qPrefix: "第", qSuffix: "题", qDone: "恭喜完成今日挑战！🎉<br>你获得了 {xp} 点 XP！", btnHome: "返回主页",
-                aiTitle: "真实 Gemini AI 助手", aiSub: "基于本地服务器运算，有问必答，拒绝死板预设", aiIntro: "你好！我已经全面升级为真正的Live AI，由你的本地服务器保障安全。你问我什么，我都会现场思考并解答！快来考考我吧！💡",
-                aiPrompts: ['❓ 太阳为什么发光？', '✏️ 帮我写一段关于友情的优美句子', '📖 什么是多音多义字？'], btnSend: "发送",
-                tTitle: "教师数据中心", tInsightT: "💡 班级整体概况", tInsightD: "点击下方每位学生的【生成 AI 分析】，系统将把该生数据发送给本地服务器，由真实 AI 生成专业的教学干预建议。",
-                th: ['学生姓名', '当前萌宠', '词汇掌握', '语法应用', '生成 AI 分析'], tBtnAna: "✨ 生成 AI 分析",
+                nav: ['主页', '答题', 'AI助手', '图鉴', '教师'], sub: "KSSR 互动平台", xpLabel: "XP:", 
+                petTitle: "我的萌宠", petDesc: "答题赚星星，让宠物进化！", btnStart: "开始任务",
+                qPrefix: "第", qSuffix: "题", qDone: "恭喜完成！🎉<br>获得 {xp} XP！", btnHome: "返回",
+                aiTitle: "真实 AI 助手", aiIntro: "你好！我连接了真实的云端大脑，有问必答！💡",
+                aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'], btnSend: "发送",
+                tTitle: "数据中心", th: ['学生', '词汇', '语法', '生成 AI 分析'], tBtnAna: "✨ 分析",
                 petNames: ['灵力蛋', '青青虫', '幻彩蝶', '翱翔鹰', '传说神龙'],
                 quiz: [
-                    { q: "选择正确的拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
-                    { q: "“今天天气很___，我们去放风筝吧！” 空格处应填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 },
-                    { q: "哪一个是表示“学校”的词？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
+                    { q: "选择正确拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
+                    { q: "“今天天气很___，去放风筝吧！” 填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 },
+                    { q: "表示“School”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
                 ],
-                swal: { wrongT: "哎呀，答错了", wrongD: "需要真实的 AI 老师帮你解释一下吗？", askAI: "问问 AI", nextQ: "继续下一题", evoT: "进化啦！", evoD: "你的宠物突破了境界，变成了" }
+                swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？", askAI: "问问 AI", nextQ: "下一题", evoT: "进化啦！", evoD: "宠物变成了" }
             },
             ms: {
-                nav: ['Laman Utama', 'Latihan Mandarin', 'Tutor AI Sebenar', 'Koleksi Haiwan', 'Data Guru'], sub: "Platform Interaktif KSSR", xpLabel: "XP:", 
-                petTitle: "Haiwan Pembelajaran", petDesc: "Siapkan tugasan untuk kumpul bintang dan evolusi haiwan anda!", btnStart: "Mula Tugasan",
-                qPrefix: "Soalan", qSuffix: "", qDone: "Tahniah!🎉<br>Anda mendapat {xp} XP!", btnHome: "Kembali",
-                aiTitle: "Tutor AI Gemini Pintar", aiSub: "Dikuasakan oleh pelayan tempatan, sifar skrip", aiIntro: "Hai! Saya AI sebenar yang memproses data melalui pelayan anda. Tanya sahaja apa-apa secara bebas! 💡",
-                aiPrompts: ['❓ Kenapa matahari bersinar?', '✏️ Bina ayat tentang persahabatan', '📖 Apa itu perkataan banyak sebutan?'], btnSend: "Hantar",
-                tTitle: "Pusat Data Guru", tInsightT: "💡 Gambaran Keseluruhan", tInsightD: "Klik 【Jana Analisis AI】 di bawah, sistem akan meminta pelayan menjana cadangan intervensi yang unik oleh AI sebenar.",
-                th: ['Nama Pelajar', 'Haiwan Semasa', 'Kosa Kata', 'Tatabahasa', 'Analisis Pelayan AI'], tBtnAna: "✨ Jana Analisis AI",
+                nav: ['Utama', 'Kuiz', 'Tutor AI', 'Koleksi', 'Guru'], sub: "Platform KSSR", xpLabel: "XP:", 
+                petTitle: "Haiwan Saya", petDesc: "Siapkan tugasan & kumpul bintang!", btnStart: "Mula",
+                qPrefix: "S.", qSuffix: "", qDone: "Tahniah!🎉<br>Dapat {xp} XP!", btnHome: "Kembali",
+                aiTitle: "Tutor AI Pintar", aiIntro: "Hai! Saya AI sebenar. Tanya apa sahaja! 💡",
+                aiPrompts: ['❓ Kenapa matahari bersinar', '✏️ Bina ayat persahabatan', '📖 Apa itu Polyphony'], btnSend: "Hantar",
+                tTitle: "Data Guru", th: ['Pelajar', 'Kosa Kata', 'Tatabahasa', 'Analisis AI'], tBtnAna: "✨ Analisis",
                 petNames: ['Telur Magik', 'Ulat Hijau', 'Rama-rama', 'Helang', 'Naga Legenda'],
                 quiz: [
-                    { q: "Pilih pinyin yang betul untuk: 马来西亚 (Malaysia)", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
-                    { q: "Isi tempat kosong: “今天天气很___，我们去放风筝吧！” (Cuaca hari ini sangat ___, jom main layang-layang!)", opts: ["下雨 (Hujan)", "晴朗 (Cerah)", "伤心 (Sedih)", "黑暗 (Gelap)"], ans: 1 },
-                    { q: "Yang manakah perkataan bermaksud “Sekolah”?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
+                    { q: "Pinyin yang betul untuk: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
+                    { q: "Isi tempat kosong: “今天天气很___...”", opts: ["下雨 (Hujan)", "晴朗 (Cerah)", "伤心 (Sedih)", "黑暗 (Gelap)"], ans: 1 },
+                    { q: "Maksud “Sekolah”?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
                 ],
-                swal: { wrongT: "Alamak, Salah!", wrongD: "Perlukan Cikgu AI sebenar terangkan?", askAI: "Tanya AI", nextQ: "Seterusnya", evoT: "Evolusi!", evoD: "Haiwan anda telah berevolusi menjadi" }
+                swal: { wrongT: "Salah!", wrongD: "Perlukan Cikgu AI terangkan?", askAI: "Tanya AI", nextQ: "Seterusnya", evoT: "Evolusi!", evoD: "Haiwan anda menjadi" }
             },
             en: {
-                nav: ['Dashboard', 'Mandarin Quests', 'Live AI Tutor', 'Pet Pokedex', 'Teacher Data'], sub: "KSSR Interactive Platform", xpLabel: "XP:", 
-                petTitle: "My Learning Pet", petDesc: "Complete quests to earn stars and evolve your pet!", btnStart: "Start Quests",
-                qPrefix: "Question", qSuffix: "", qDone: "Congratulations!🎉<br>You earned {xp} XP!", btnHome: "Home",
-                aiTitle: "Live Gemini AI Tutor", aiSub: "Running on local backend server. No presets.", aiIntro: "Hi! I am a fully integrated Live AI running securely on your server. I have no pre-written scripts. Ask me absolutely anything! 💡",
-                aiPrompts: ['❓ Why does the sun shine?', '✏️ Write a beautiful sentence about friendship', '📖 Explain polyphonic words'], btnSend: "Send",
-                tTitle: "Teacher Data Center", tInsightT: "💡 Class Overview", tInsightD: "Click 【Generate AI Analysis】 below to securely call the real AI via your backend for personalized teaching intervention suggestions.",
-                th: ['Student', 'Current Pet', 'Vocab', 'Grammar', 'Real AI Analysis'], tBtnAna: "✨ Generate AI Analysis",
-                petNames: ['Magic Egg', 'Green Caterpillar', 'Mystic Butterfly', 'Soaring Eagle', 'Legendary Dragon'],
+                nav: ['Home', 'Quests', 'Live AI', 'Pokedex', 'Teacher'], sub: "KSSR Platform", xpLabel: "XP:", 
+                petTitle: "My Pet", petDesc: "Do quests to earn stars!", btnStart: "Start",
+                qPrefix: "Q", qSuffix: "", qDone: "Congrats!🎉<br>Earned {xp} XP!", btnHome: "Home",
+                aiTitle: "Live AI Tutor", aiIntro: "Hi! I'm a Live AI. Ask me anything! 💡",
+                aiPrompts: ['❓ Why sun shines', '✏️ Write about friendship', '📖 Explain Polyphony'], btnSend: "Send",
+                tTitle: "Teacher Data", th: ['Student', 'Vocab', 'Grammar', 'Real AI Analysis'], tBtnAna: "✨ Analysis",
+                petNames: ['Magic Egg', 'Green Caterpillar', 'Mystic Butterfly', 'Eagle', 'Dragon'],
                 quiz: [
-                    { q: "Choose the correct pinyin for: 马来西亚 (Malaysia)", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
-                    { q: "Fill in the blank: “今天天气很___，我们去放风筝吧！” (The weather is very ___ today, let's fly kites!)", opts: ["下雨 (Rainy)", "晴朗 (Sunny)", "伤心 (Sad)", "黑暗 (Dark)"], ans: 1 },
-                    { q: "Which word means “School”?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
+                    { q: "Correct pinyin for: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
+                    { q: "Fill in: “今天天气很___...”", opts: ["下雨 (Rainy)", "晴朗 (Sunny)", "伤心 (Sad)", "黑暗 (Dark)"], ans: 1 },
+                    { q: "Word for “School”?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
                 ],
-                swal: { wrongT: "Oops, Incorrect!", wrongD: "Need the Live AI Tutor to explain?", askAI: "Ask AI", nextQ: "Next", evoT: "Evolution!", evoD: "Your pet evolved into" }
+                swal: { wrongT: "Incorrect!", wrongD: "Need AI Tutor?", askAI: "Ask AI", nextQ: "Next", evoT: "Evolution!", evoD: "Your pet evolved into" }
             }
         };
 
         const studentData = [
-            { name: "林小明", pet: "🦋 Lv.3", vocab: "TP 6", grammar: "TP 2", vCol: "text-purple-600", gCol: "text-red-500" },
-            { name: "阿布 (Abu)", pet: "🐛 Lv.2", vocab: "TP 3", grammar: "TP 3", vCol: "text-amber-500", gCol: "text-amber-500" },
-            { name: "陈美玲", pet: "🐉 Lv.5", vocab: "TP 6", grammar: "TP 6", vCol: "text-purple-600", gCol: "text-purple-600" },
-            { name: "Siti", pet: "🥚 Lv.1", vocab: "TP 2", grammar: "TP 1", vCol: "text-red-500", gCol: "text-red-500" }
+            { name: "林小明", vocab: "TP 6", grammar: "TP 2", vCol: "text-purple-600", gCol: "text-red-500" },
+            { name: "阿布", vocab: "TP 3", grammar: "TP 3", vCol: "text-amber-500", gCol: "text-amber-500" },
+            { name: "陈美玲", vocab: "TP 6", grammar: "TP 6", vCol: "text-purple-600", gCol: "text-purple-600" },
+            { name: "Siti", vocab: "TP 2", grammar: "TP 1", vCol: "text-red-500", gCol: "text-red-500" }
         ];
 
         let currLang = 'zh';
@@ -238,7 +219,7 @@
         function playSound(type) {
             if (!isAudioInit || Tone.Destination.mute) return; const now = Tone.now();
             if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
-            if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); synths.coin.triggerAttackRelease("G5", "16n", now+0.2); }
+            if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
             if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
             if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
         }
@@ -249,18 +230,16 @@
             document.getElementById('ui-xp-label').innerHTML = `${t.xpLabel} <span id="xp-text" class="text-indigo-600">${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}</span>`;
             document.getElementById('ui-pet-title').innerText = t.petTitle; document.getElementById('ui-pet-desc').innerText = t.petDesc;
             document.getElementById('ui-btn-start').innerText = t.btnStart; document.getElementById('pet-name').innerText = t.petNames[level-1];
-            document.getElementById('ui-ai-title').innerText = t.aiTitle; document.getElementById('ui-ai-subtitle').innerText = t.aiSub;
-            document.getElementById('ui-ai-intro').innerText = t.aiIntro; document.getElementById('ui-btn-send').innerText = t.btnSend;
+            document.getElementById('ui-ai-title').innerText = t.aiTitle; document.getElementById('ui-ai-intro').innerText = t.aiIntro; document.getElementById('ui-btn-send').innerText = t.btnSend;
             
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => {
                 let textPrompt = langData.zh.aiPrompts[idx].substring(2);
-                promptBox.innerHTML += `<button onclick="sendQuickMessage('${textPrompt}')" class="bg-white border-2 border-slate-200 text-indigo-700 hover:bg-indigo-50 px-4 py-1.5 rounded-full text-base font-bold shadow-sm transition-all active:scale-95">${p}</button>`;
+                promptBox.innerHTML += `<button onclick="sendQuickMessage('${textPrompt}')" class="bg-white border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold active:scale-95">${p}</button>`;
             });
 
             document.getElementById('ui-t-title').innerText = t.tTitle;
-            document.getElementById('ui-t-insight-t').innerText = t.tInsightT; document.getElementById('ui-t-insight-d').innerText = t.tInsightD;
-            t.th.forEach((thText, i) => document.getElementById(`ui-th-${i+1}`).innerText = thText);
+            t.th.forEach((thText, i) => { if(document.getElementById(`ui-th-${i+1}`)) document.getElementById(`ui-th-${i+1}`).innerText = thText; });
             
             renderNav(); renderTeacherTable();
             if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
@@ -270,10 +249,10 @@
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
             langData[currLang].nav.forEach((title, i) => {
                 const navItem = navIcons[i]; const btn = document.createElement('button');
-                btn.className = `nav-btn w-[180px] md:w-full flex-shrink-0 text-left px-4 py-3 flex items-center gap-4 rounded-xl mb-2 bg-white/50 border border-slate-200`;
+                btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-slate-200 md:mb-2`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
                 btn.onclick = () => { playSound('click'); if (navItem.id === 'pokedex') { showPokedex(); return; } switchView(navItem.id); };
-                btn.innerHTML = `<div class="icon-box w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-lg whitespace-nowrap">${title}</span>`;
+                btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg md:text-xl border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
@@ -282,13 +261,12 @@
             const tbody = document.getElementById('teacher-table-body'); const btnText = langData[currLang].tBtnAna; tbody.innerHTML = '';
             studentData.forEach((s, idx) => {
                 tbody.innerHTML += `
-                    <tr class="border-t border-slate-200 hover:bg-white transition">
-                        <td class="p-4 font-bold text-lg text-slate-700">${s.name}</td>
-                        <td class="p-4 font-bold text-lg text-slate-600">${s.pet}</td>
-                        <td class="p-4 ${s.vCol} font-bold text-lg">${s.vocab}</td>
-                        <td class="p-4 ${s.gCol} font-bold text-lg">${s.grammar}</td>
-                        <td class="p-4 text-center">
-                            <button onclick="generateTeacherAIAnalysis(${idx})" class="bg-indigo-50 text-indigo-700 border-2 border-indigo-200 px-4 py-1.5 rounded-lg font-bold hover:bg-indigo-100 shadow-sm transition-all active:scale-95">${btnText}</button>
+                    <tr class="border-t border-slate-200 hover:bg-white">
+                        <td class="p-2 md:p-3 font-bold text-slate-700">${s.name}</td>
+                        <td class="p-2 md:p-3 ${s.vCol} font-bold">${s.vocab}</td>
+                        <td class="p-2 md:p-3 ${s.gCol} font-bold">${s.grammar}</td>
+                        <td class="p-2 md:p-3 text-center">
+                            <button onclick="generateTeacherAIAnalysis(${idx})" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1 rounded font-bold hover:bg-indigo-100 active:scale-95 text-xs md:text-sm">${btnText}</button>
                         </td>
                     </tr>`;
             });
@@ -304,6 +282,7 @@
         }
 
         function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
+        
         function loadQuestion() {
             const t = langData[currLang]; const qData = t.quiz;
             if (currentQ >= qData.length) {
@@ -322,17 +301,15 @@
             document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) {
                 btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore;
-                const star = document.createElement('div'); star.className = 'star-anim'; star.innerHTML = '⭐';
-                star.style.left = `${e.clientX - 20}px`; star.style.top = `${e.clientY - 40}px`; document.body.appendChild(star);
-                setTimeout(() => star.remove(), 800); gainXP(10);
+                gainXP(10);
             } else {
                 btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct');
                 setTimeout(() => {
                     Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: t.swal.askAI, cancelButtonText: t.swal.nextQ, confirmButtonColor: '#4f46e5'
-                    }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`这道题我选错了："${langData.zh.quiz[currentQ].q}"，请给我真实的解释！`); currentQ++; } else { currentQ++; loadQuestion(); }});
+                    }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`这道题我选错了："${langData.zh.quiz[currentQ].q}"，请解释！`); currentQ++; } else { currentQ++; loadQuestion(); }});
                 }, 800); return;
             }
-            setTimeout(() => { currentQ++; loadQuestion(); }, 1200);
+            setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
         function gainXP(amount) {
@@ -340,10 +317,10 @@
             if(level < 5 && xp >= nextLimit) {
                 level++; playSound('levelup');
                 Swal.fire({
-                    html: `<div class="text-9xl my-4 bounce-slow drop-shadow-2xl">${petStages[level-1]}</div>
-                           <h2 class="text-4xl font-bold text-amber-500 mb-2">${t.swal.evoT}</h2>
-                           <p class="text-slate-700 text-xl font-bold">${t.swal.evoD} <br><b class="text-indigo-600 text-3xl">${t.petNames[level-1]}</b>！</p>`,
-                    confirmButtonText: '✨ 收下神宠', confirmButtonColor: '#4f46e5', backdrop: `rgba(15, 23, 42, 0.9)`, customClass: { popup: 'rounded-3xl' }
+                    html: `<div class="text-7xl my-4 bounce-slow drop-shadow-lg">${petStages[level-1]}</div>
+                           <h2 class="text-2xl font-bold text-amber-500 mb-2">${t.swal.evoT}</h2>
+                           <p class="text-slate-700 text-lg font-bold">${t.swal.evoD} <br><b class="text-indigo-600 text-2xl">${t.petNames[level-1]}</b>！</p>`,
+                    confirmButtonText: '✨ 收下神宠', confirmButtonColor: '#4f46e5', customClass: { popup: 'rounded-2xl' }
                 });
                 nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
             }
@@ -353,27 +330,17 @@
         }
 
         function showPokedex() {
-            const t = langData[currLang]; let html = '<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 overflow-y-auto max-h-[60vh] p-2">';
+            const t = langData[currLang]; let html = '<div class="grid grid-cols-2 gap-3 mt-4 overflow-y-auto max-h-[50vh] p-1">';
             for(let i=0; i<5; i++) {
-                let unlocked = level > i; let cardClass = unlocked ? 'bg-white pet-glow border-2 border-amber-400' : 'bg-slate-100 border-2 border-slate-200 pet-locked';
-                let atk = unlocked ? (i+1)*200 : '???'; let int = unlocked ? (i+1)*350 : '???';
-                html += `
-                    <div class="pet-card rounded-2xl flex flex-col items-center p-4 relative ${cardClass}">
-                        ${unlocked ? `<span class="absolute top-2 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">Lv.${i+1}</span>` : ''}
-                        <div class="text-6xl mb-3 drop-shadow-lg pt-2">${petStages[i]}</div>
-                        <span class="text-lg font-bold text-slate-800 mb-2">${unlocked ? t.petNames[i] : '神秘生物'}</span>
-                        <div class="w-full bg-slate-50 p-2 rounded-lg text-xs font-bold text-slate-500 flex justify-between border border-slate-200">
-                            <span>⚔️ 武力 <span class="text-red-500">${atk}</span></span>
-                            <span>💡 智力 <span class="text-blue-500">${int}</span></span>
-                        </div>
-                    </div>`;
+                let unlocked = level > i; let cardClass = unlocked ? 'bg-white pet-glow border-2 border-amber-400' : 'bg-slate-100 border border-slate-200 pet-locked';
+                html += `<div class="pet-card rounded-xl flex flex-col items-center p-3 relative ${cardClass}">
+                            <div class="text-4xl mb-2 drop-shadow-md pt-2">${petStages[i]}</div>
+                            <span class="text-sm font-bold text-slate-800 mb-1">${unlocked ? t.petNames[i] : '???'}</span>
+                        </div>`;
             }
-            Swal.fire({ title: `<h2 class="text-3xl font-bold text-slate-800">📖 ${t.nav[3]}</h2>`, html: html + '</div>', confirmButtonColor: '#4f46e5', width: '800px', customClass: { popup: 'rounded-3xl' } });
+            Swal.fire({ title: `<h2 class="text-2xl font-bold">📖 ${t.nav[3]}</h2>`, html: html + '</div>', confirmButtonColor: '#4f46e5', customClass: { popup: 'rounded-2xl' } });
         }
 
-        /* =========================================================
-           🚀 发送请求至本地 Node.js 服务器
-        ========================================================= */
         async function fetchAIFromServer(promptText) {
             try {
                 const response = await fetch('/api/gemini', {
@@ -381,39 +348,33 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: promptText })
                 });
-                
                 const data = await response.json();
-                if (!response.ok) {
-                    return `⚠️ 服务器端报错: ${data.error}`;
-                }
+                if (!response.ok) return `⚠️ 报错: ${data.error}`;
                 return data.text.replace(/\n/g, '<br>');
             } catch (error) {
-                return `⚠️ 无法连接到您的本地服务器。<br><br>👉 请确保您已在 VS Code 的终端中运行了：<br><b>node server.js</b>`;
+                return `⚠️ 无法连接服务器。`;
             }
         }
 
         const chatBox = document.getElementById('chat-messages'); const aiInput = document.getElementById('user-input');
 
         function appendMsg(sender, text) {
-            const div = document.createElement('div'); div.className = `flex items-end gap-3 ${sender === 'ai' ? 'ai-msg' : 'user-msg flex-row-reverse'}`;
-            div.innerHTML = `<div class="w-10 h-10 rounded-full flex items-center justify-center text-2xl shrink-0 ${sender==='ai'?'bg-indigo-100 border border-indigo-200 pb-1':'bg-slate-200 hidden'}">${sender==='ai'?'🤖':'👦'}</div><div class="bubble font-bold text-lg leading-relaxed">${text}</div>`;
+            const div = document.createElement('div'); div.className = `flex items-end gap-2 ${sender === 'ai' ? 'ai-msg' : 'user-msg flex-row-reverse'}`;
+            div.innerHTML = `<div class="w-8 h-8 rounded-full flex items-center justify-center text-lg shrink-0 ${sender==='ai'?'bg-indigo-100 border border-indigo-200 pb-1':'hidden'}">🤖</div><div class="bubble font-bold text-sm md:text-base">${text}</div>`;
             chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight; if(sender === 'ai') playSound('jump');
         }
 
         function showTyping() {
-            const div = document.createElement('div'); div.id = 'typing-indicator'; div.className = 'flex items-end gap-3 ai-msg';
-            div.innerHTML = `<div class="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-2xl shrink-0 pb-1">🤖</div><div class="bubble flex items-center h-12 gap-2 px-4"><div class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div><div class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 300ms"></div></div>`;
+            const div = document.createElement('div'); div.id = 'typing-indicator'; div.className = 'flex items-end gap-2 ai-msg';
+            div.innerHTML = `<div class="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-lg shrink-0 pb-1">🤖</div><div class="bubble flex items-center h-10 gap-1 px-3"><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 300ms"></div></div>`;
             chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         async function handleSend() {
             const text = aiInput.value.trim(); if(!text) return;
             appendMsg('user', text); aiInput.value = ''; showTyping();
-            
-            let prompt = `你是一个非常聪明、友善的马来西亚华文老师(AI)。学生问你："${text}"。请用非常易懂、有趣的语言（包含Emoji）回答，使用 ${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'}，控制在3句话以内。`;
-            
+            let prompt = `你是马来西亚华文老师(AI)。学生问："${text}"。请用生动语言(${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'})回答，控制在3句话以内。`;
             let aiReply = await fetchAIFromServer(prompt);
-
             document.getElementById('typing-indicator').remove();
             appendMsg('ai', aiReply);
         }
@@ -423,16 +384,13 @@
 
         async function generateTeacherAIAnalysis(studentIndex) {
             const student = studentData[studentIndex];
-            Swal.fire({ title: '🤖 真实 AI 分析中...', html: `正在呼叫本地服务器为 <b>${student.name}</b> 生成教学建议...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-
-            let prompt = `你是一位马来西亚华小资深教师。你的学生 ${student.name}，词汇成绩是 ${student.vocab}，语法成绩是 ${student.grammar}。(TP1最差，TP6最好)。请用 ${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'} 给出一段 30 字左右的具体教学补救建议。`;
-            
+            Swal.fire({ title: '🤖 AI 分析中...', html: `为 <b>${student.name}</b> 生成建议...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            let prompt = `你是马来西亚华小教师。学生 ${student.name}，词汇 ${student.vocab}，语法 ${student.grammar}。(TP1最差,TP6最好)。用${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'}给30字补救建议。`;
             let analysis = await fetchAIFromServer(prompt);
-
             if (analysis && analysis.includes("⚠️")) {
-                Swal.fire({ title: `⚠️ AI 分析失败`, html: `<div class="text-left bg-red-50 p-4 rounded-xl text-red-900 border border-red-200">${analysis}</div>`, icon: 'error', confirmButtonColor: '#4f46e5' });
+                Swal.fire({ title: `⚠️ 失败`, html: `<div class="bg-red-50 p-3 rounded-lg text-red-900">${analysis}</div>`, icon: 'error', confirmButtonColor: '#4f46e5' });
             } else {
-                Swal.fire({ title: `✨ AI 诊断报告: ${student.name}`, html: `<div class="text-left bg-indigo-50 p-4 rounded-xl text-lg font-bold text-indigo-900 border-2 border-indigo-200 mt-2">${analysis}</div>`, icon: 'info', confirmButtonText: '确定 (OK)', confirmButtonColor: '#4f46e5', customClass: { popup: 'rounded-3xl' } });
+                Swal.fire({ title: `✨ 报告: ${student.name}`, html: `<div class="bg-indigo-50 p-3 rounded-lg text-sm font-bold text-indigo-900 text-left">${analysis}</div>`, icon: 'info', confirmButtonText: 'OK', confirmButtonColor: '#4f46e5' });
             }
         }
 
