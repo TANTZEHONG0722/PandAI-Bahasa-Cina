@@ -32,52 +32,66 @@
         .ai-msg .bubble { background: white; border: 2px solid #e2e8f0; border-bottom-left-radius: 0.25rem; color: #334155; }
         .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
         
-        /* 登录界面的毛玻璃特效 */
         #login-portal { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.7); transition: opacity 0.5s ease; }
-        .role-btn { transition: all 0.2s; border: 2px solid transparent; }
-        .role-btn.selected { border-color: #4f46e5; background-color: #e0e7ff; color: #4f46e5; font-weight: bold; }
     </style>
 </head>
 <body class="flex flex-col relative">
 
     <!-- 全屏登录大厅 -->
     <div id="login-portal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 flex flex-col gap-4 relative overflow-hidden">
-            <div class="text-center mb-2">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-300">
+            
+            <!-- ====== 第一步：身份选择界面 ====== -->
+            <div id="step-1-role" class="flex flex-col gap-4 text-center">
                 <div class="text-5xl mb-2">🚀</div>
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-800">PandAI Bahasa Cina</h1>
-                <p class="text-indigo-600 font-bold mt-1" id="auth-subtitle">请登录进入系统</p>
+                <p class="text-slate-500 font-bold mb-4">请选择您的身份以进入系统</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="goToStep2('student')" class="bg-white border-2 border-slate-200 hover:border-indigo-500 hover:shadow-md rounded-2xl p-6 flex flex-col items-center gap-3 transition-all active:scale-95">
+                        <span class="text-5xl">👦</span>
+                        <span class="font-bold text-slate-700 text-lg">我是学生</span>
+                    </button>
+                    <button onclick="goToStep2('teacher')" class="bg-white border-2 border-slate-200 hover:border-purple-500 hover:shadow-md rounded-2xl p-6 flex flex-col items-center gap-3 transition-all active:scale-95">
+                        <span class="text-5xl">👩‍🏫</span>
+                        <span class="font-bold text-slate-700 text-lg">我是教师</span>
+                    </button>
+                </div>
             </div>
-            
-            <!-- 身份选择按钮 -->
-            <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
-                <button id="role-student" onclick="window.setRole('student')" class="role-btn selected flex-1 py-2 rounded-lg text-slate-600">👦 学生</button>
-                <button id="role-teacher" onclick="window.setRole('teacher')" class="role-btn flex-1 py-2 rounded-lg text-slate-600">👩‍🏫 教师</button>
+
+            <!-- ====== 第二步：登录表单界面 (默认隐藏) ====== -->
+            <div id="step-2-auth" class="hidden flex-col gap-4 text-center">
+                <div class="flex items-center justify-between mb-2">
+                    <button onclick="goBackToStep1()" class="text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 active:scale-95 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 返回
+                    </button>
+                    <h2 id="auth-role-title" class="text-xl font-bold text-slate-800">登录</h2>
+                    <div class="w-16"></div> <!-- 占位符，用于居中对齐标题 -->
+                </div>
+                
+                <p class="text-indigo-600 font-bold mt-1 text-sm" id="auth-subtitle">请登录您的专属账号</p>
+
+                <form id="auth-form" onsubmit="window.handleAuth(event)" class="flex flex-col gap-3 mt-2 text-left">
+                    <input type="text" id="auth-name" placeholder="您的全名 (仅注册需填写)" class="hidden bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
+                    <input type="email" id="auth-email" placeholder="DELIMa / MOE 电子邮件" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
+                    <input type="password" id="auth-password" placeholder="密码 (至少6位)" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
+                    <button type="submit" id="auth-action-btn" class="bg-indigo-600 text-white font-bold rounded-xl py-3 mt-2 shadow-lg shadow-indigo-200 active:scale-95 transition-all text-center">登 录</button>
+                </form>
+                
+                <div class="flex items-center justify-between text-sm font-bold mt-2">
+                    <button onclick="window.toggleAuthMode()" id="auth-toggle-btn" class="text-indigo-600 hover:underline">没有账号？点击注册</button>
+                    <button onclick="window.resetPassword()" class="text-slate-500 hover:underline">忘记密码？</button>
+                </div>
+                
+                <div class="flex items-center gap-4 my-2">
+                    <div class="h-px bg-slate-200 flex-1"></div><span class="text-xs font-bold text-slate-400">或</span><div class="h-px bg-slate-200 flex-1"></div>
+                </div>
+                
+                <button onclick="window.loginWithGoogle()" class="bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl py-3 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-50">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> 
+                    使用 Google 账号继续
+                </button>
             </div>
-            
-            <!-- 登录/注册表单 -->
-            <form id="auth-form" onsubmit="window.handleAuth(event)" class="flex flex-col gap-3">
-                <input type="text" id="auth-name" placeholder="您的全名 (仅注册需填写)" class="hidden bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
-                <input type="email" id="auth-email" placeholder="DELIMa / MOE 电子邮件" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
-                <input type="password" id="auth-password" placeholder="密码 (至少6位)" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
-                <button type="submit" id="auth-action-btn" class="bg-indigo-600 text-white font-bold rounded-xl py-3 mt-2 shadow-lg shadow-indigo-200 active:scale-95 transition-all">登 录</button>
-            </form>
-            
-            <div class="flex items-center justify-between text-sm font-bold mt-2">
-                <button onclick="window.toggleAuthMode()" id="auth-toggle-btn" class="text-indigo-600 hover:underline">没有账号？点击注册</button>
-                <button onclick="window.resetPassword()" class="text-slate-500 hover:underline">忘记密码？</button>
-            </div>
-            
-            <div class="flex items-center gap-4 my-2">
-                <div class="h-px bg-slate-200 flex-1"></div>
-                <span class="text-xs font-bold text-slate-400">或</span>
-                <div class="h-px bg-slate-200 flex-1"></div>
-            </div>
-            
-            <button onclick="window.loginWithGoogle()" class="bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl py-3 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-50">
-                <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> 
-                使用 Google 账号继续
-            </button>
         </div>
     </div>
 
@@ -335,7 +349,7 @@
         window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
     </script>
 
-    <!-- Firebase 身份验证逻辑 (含 DELIMa 智能拦截系统 & 绝对覆盖控制) -->
+    <!-- Firebase 身份验证及二步登录流程逻辑 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
@@ -355,14 +369,42 @@
         let isRegisterMode = false; 
         window.selectedRole = 'student'; 
 
-        window.setRole = (role) => { 
-            window.selectedRole = role; 
-            document.getElementById('role-student').classList.remove('selected'); 
-            document.getElementById('role-teacher').classList.remove('selected'); 
-            document.getElementById(`role-${role}`).classList.add('selected'); 
+        // 切换到第二步（表单）
+        window.goToStep2 = (role) => {
+            window.selectedRole = role;
+            document.getElementById('step-1-role').classList.add('hidden');
+            document.getElementById('step-1-role').classList.remove('flex');
+            document.getElementById('step-2-auth').classList.remove('hidden');
+            document.getElementById('step-2-auth').classList.add('flex');
+            updateAuthUI();
         };
-        
-        window.toggleAuthMode = () => { isRegisterMode = !isRegisterMode; document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录进入系统'; };
+
+        // 返回第一步（身份选择）
+        window.goBackToStep1 = () => {
+            document.getElementById('step-2-auth').classList.add('hidden');
+            document.getElementById('step-2-auth').classList.remove('flex');
+            document.getElementById('step-1-role').classList.remove('hidden');
+            document.getElementById('step-1-role').classList.add('flex');
+            isRegisterMode = false; 
+            updateAuthUI();
+        };
+
+        // 切换登录/注册模式
+        window.toggleAuthMode = () => { 
+            isRegisterMode = !isRegisterMode; 
+            updateAuthUI();
+        };
+
+        // 统一更新登录界面的文字内容
+        function updateAuthUI() {
+            document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); 
+            document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; 
+            document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; 
+            document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录您的专属账号';
+            document.getElementById('auth-role-title').innerText = window.selectedRole === 'student' 
+                ? (isRegisterMode ? '👦 学生注册' : '👦 学生登录') 
+                : (isRegisterMode ? '👩‍🏫 教师注册' : '👩‍🏫 教师登录');
+        }
 
         // DELIMa 邮箱智能拦截规则
         function validateDelimaEmail(email, role) {
@@ -375,7 +417,7 @@
                     }
                 } else if (role === 'student') {
                     if (lowerEmail.startsWith('g-')) {
-                        Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请切换到【教师】身份进行操作！', 'warning');
+                        Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请返回并以【教师】身份登录！', 'warning');
                         return false;
                     }
                 }
@@ -401,7 +443,7 @@
                     const userCredential = await signInWithEmailAndPassword(auth, email, password); 
                     userUid = userCredential.user.uid;
                 }
-                // 强制将界面上选中的身份写入数据库 (掌握绝对决定权)
+                // 强制将界面上选中的身份写入数据库
                 await setDoc(doc(db, "users", userUid), { name: name, email: email, role: window.selectedRole }, { merge: true });
                 Swal.close();
             } catch (error) { Swal.fire('错误', error.message.replace('Firebase:', ''), 'error'); }
@@ -431,7 +473,10 @@
             const email = document.getElementById('auth-email').value; if(!email) return Swal.fire('提示', '请先在上方输入您的邮箱', 'info');
             try { await sendPasswordResetEmail(auth, email); Swal.fire('已发送', '密码重置链接已发送到您的邮箱', 'success'); } catch (error) { Swal.fire('错误', '发送失败，请确保邮箱正确填写', 'error'); }
         };
-        window.logout = () => signOut(auth);
+        window.logout = () => {
+            signOut(auth);
+            goBackToStep1(); // 退出时自动重置回身份选择页面
+        };
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
