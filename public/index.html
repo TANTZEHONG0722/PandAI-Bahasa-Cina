@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智学华文 PandAI Bahasa Cina</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -10,30 +10,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* 绚丽动态流光背景 */
-        body, html { 
-            height: 100%; margin: 0; color: #1e293b; font-family: 'STKaiti', '楷体', serif !important; overflow: hidden; 
-            background: linear-gradient(-45deg, #a1c4fd, #fecfef, #b19cd9, #ffecd2, #ff9a9e);
-            background-size: 400% 400%;
-            animation: flowingBG 18s ease infinite;
-        }
+        body, html { height: 100%; margin: 0; color: #1e293b; font-family: 'STKaiti', '楷体', serif !important; overflow: hidden; background: linear-gradient(-45deg, #a1c4fd, #fecfef, #b19cd9, #ffecd2, #ff9a9e); background-size: 400% 400%; animation: flowingBG 18s ease infinite; }
         @keyframes flowingBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
         * { font-family: inherit !important; }
         .scrollable-area { overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         
-        /* 升级版通透毛玻璃质感 */
-        .glass-panel { 
-            background: rgba(255, 255, 255, 0.65); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.7); 
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); 
-        }
-        
+        .glass-panel { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
         .nav-btn { transition: all 0.3s; border: 2px solid transparent; }
         .nav-btn.active { background: #4f46e5; color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); transform: translateY(-2px); }
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); }
@@ -50,23 +33,16 @@
         .ai-msg .bubble { background: rgba(255,255,255,0.9); border: 2px solid #e2e8f0; border-bottom-left-radius: 0.25rem; color: #334155; }
         .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
         
-        /* 登录界面的毛玻璃特效 (去除沉闷的黑底) */
-        #login-portal { 
-            backdrop-filter: blur(15px); 
-            background: rgba(255, 255, 255, 0.15); 
-            transition: opacity 0.5s ease; 
-        }
+        #login-portal { backdrop-filter: blur(15px); background: rgba(255, 255, 255, 0.15); transition: opacity 0.5s ease; }
         .role-btn { transition: all 0.2s; border: 2px solid transparent; background: rgba(255,255,255,0.8); }
         .role-btn.selected { border-color: #4f46e5; background-color: #e0e7ff; color: #4f46e5; font-weight: bold; }
-        
-        /* 录音波纹特效 */
         .recording-pulse { animation: pulse-ring 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body class="flex flex-col relative">
 
-    <!-- 全屏登录大厅 (两步走) -->
+    <!-- 全屏登录大厅 -->
     <div id="login-portal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 border-t-2 border-l-2 border-white/80">
             <div id="step-1-role" class="flex flex-col gap-4 text-center">
@@ -92,7 +68,7 @@
                 <p class="text-indigo-600 font-bold mt-1 text-sm" id="auth-subtitle">请登录您的专属账号</p>
                 <form id="auth-form" onsubmit="window.handleAuth(event)" class="flex flex-col gap-3 mt-2 text-left">
                     <input type="text" id="auth-name" placeholder="您的全名 (仅注册需填写)" class="hidden bg-white/90 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 font-bold shadow-inner">
-                    <input type="email" id="auth-email" placeholder="DELIMa / MOE 电子邮件" required class="bg-white/90 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 font-bold shadow-inner">
+                    <input type="email" id="auth-email" placeholder="DELIMa 电子邮件 (m-或g-)" required class="bg-white/90 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 font-bold shadow-inner">
                     <input type="password" id="auth-password" placeholder="密码 (至少6位)" required class="bg-white/90 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 font-bold shadow-inner">
                     <button type="submit" id="auth-action-btn" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-xl py-3 mt-2 shadow-lg shadow-indigo-200/50 hover:shadow-xl active:scale-95 transition-all text-center border border-indigo-400">登 录</button>
                 </form>
@@ -205,7 +181,10 @@
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-white/30 scrollable-area">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 drop-shadow-sm">📊 教师数据大屏</h2>
-                    <button onclick="generateAIQuiz()" class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md transition-colors flex items-center gap-1 border border-indigo-300">✨ AI 一键出题</button>
+                    <div class="flex gap-2">
+                        <button onclick="window.fetchLeaderboard()" class="bg-white/80 hover:bg-white text-indigo-600 px-3 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-1 border border-indigo-200">🔄 刷新状态</button>
+                        <button onclick="generateAIQuiz()" class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md transition-colors flex items-center gap-1 border border-indigo-300">✨ AI 一键出题</button>
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -227,12 +206,19 @@
                     </div>
                 </div>
 
-                <div class="bg-white/80 rounded-xl shadow-lg border border-white/60 overflow-hidden backdrop-blur-md">
+                <div class="bg-white/90 rounded-xl shadow-lg border border-white/60 overflow-hidden backdrop-blur-md">
                     <table class="w-full text-left min-w-[500px]">
-                        <thead class="bg-slate-100/80 text-slate-600 text-sm md:text-base border-b border-slate-200">
-                            <tr><th class="p-3 font-bold">学生姓名</th><th class="p-3 font-bold">总 XP</th><th class="p-3 font-bold">语法掌握度</th><th class="p-3 font-bold text-center">AI 分析</th></tr>
+                        <thead class="bg-slate-100/90 text-slate-600 text-sm md:text-base border-b border-slate-200">
+                            <tr>
+                                <th class="p-3 font-bold">学生姓名</th>
+                                <th class="p-3 font-bold">总 XP</th>
+                                <th class="p-3 font-bold">活跃时长 ⏱️</th>
+                                <th class="p-3 font-bold text-center">学习状态</th>
+                            </tr>
                         </thead>
-                        <tbody class="text-sm md:text-base" id="teacher-table-body"></tbody>
+                        <tbody class="text-sm md:text-base" id="teacher-table-body">
+                            <!-- 由 Firebase 动态载入 -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -243,11 +229,7 @@
     <script>
         const langData = {
             zh: { nav: ['主页', '答题', '排行榜', 'AI助手', '教师大屏'], sub: "KSSR 互动平台", xpLabel: "XP:", petTitle: "我的萌宠", petDesc: "答题赚星星，让宠物进化！", aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'],
-                quiz: [
-                    { q: "选择正确拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
-                    { q: "“今天天气很___，去放风筝吧！” 填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 },
-                    { q: "表示“学校”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
-                ], swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？" }
+                quiz: [{ q: "选择正确拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "“今天天气很___，去放风筝吧！” 填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 }, { q: "表示“学校”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？" }
             },
             ms: { nav: ['Utama', 'Kuiz', 'Ranking', 'Tutor AI', 'Guru'], sub: "Platform KSSR", xpLabel: "XP:", petTitle: "Haiwan Saya", petDesc: "Kumpul bintang untuk evolusi!", aiPrompts: ['❓ Kenapa matahari bersinar', '✏️ Bina ayat', '📖 Apa itu Polyphony'],
                 quiz: [{ q: "Pinyin yang betul: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Isi tempat kosong: 今天天气很___", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 }, { q: "Maksud sekolah?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Salah!", wrongD: "Tanya Cikgu AI?" }
@@ -260,16 +242,12 @@
         const navIcons = [{ id: 'dashboard', emoji: '🏠' }, { id: 'quiz', emoji: '🎮' }, { id: 'leaderboard', emoji: '🏆' }, { id: 'ai', emoji: '🤖' }, { id: 'teacher', emoji: '📊' }];
         
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
-        let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student';
-        let radarChartInstance = null;
+        let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
         async function initAudio() {
             if (isAudioInit) return; await Tone.start(); Tone.Destination.mute = false;
-            synths.click = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1 } }).toDestination();
-            synths.coin = new Tone.Synth({ oscillator: { type: "triangle" } }).toDestination();
-            synths.wrong = new Tone.MembraneSynth().toDestination(); synths.win = new Tone.PolySynth(Tone.Synth).toDestination();
-            synths.click.volume.value = -10; synths.coin.volume.value = -10; synths.wrong.volume.value = -5; synths.win.volume.value = -8;
-            isAudioInit = true; document.getElementById('sound-icon').innerText = "🔊";
+            synths.click = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1 } }).toDestination(); synths.coin = new Tone.Synth({ oscillator: { type: "triangle" } }).toDestination(); synths.wrong = new Tone.MembraneSynth().toDestination(); synths.win = new Tone.PolySynth(Tone.Synth).toDestination();
+            synths.click.volume.value = -10; synths.coin.volume.value = -10; synths.wrong.volume.value = -5; synths.win.volume.value = -8; isAudioInit = true; document.getElementById('sound-icon').innerText = "🔊";
         }
         function toggleAudio() { if (!isAudioInit) { initAudio(); return; } Tone.Destination.mute = !Tone.Destination.mute; document.getElementById('sound-icon').innerText = Tone.Destination.mute ? "🔇" : "🔊"; }
         function playSound(type) {
@@ -282,76 +260,43 @@
 
         window.changeLang = (lang) => {
             currLang = lang; const t = langData[currLang];
-            document.getElementById('ui-subtitle').innerText = t.sub;
-            document.getElementById('ui-xp-label').innerHTML = `${t.xpLabel} <span id="xp-text" class="text-indigo-600">${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}</span>`;
+            document.getElementById('ui-subtitle').innerText = t.sub; document.getElementById('ui-xp-label').innerHTML = `${t.xpLabel} <span id="xp-text" class="text-indigo-600">${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}</span>`;
             document.getElementById('ui-pet-title').innerText = t.petTitle; document.getElementById('ui-pet-desc').innerText = t.petDesc;
-            
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white/90 border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">${p}</button>`; });
-
-            renderNav(); 
-            if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
+            renderNav(); if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
         }
 
         function renderNav() {
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
             const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 3]; 
-            
             allowedIndices.forEach(i => {
-                const navItem = navIcons[i]; const title = langData[currLang].nav[i];
-                const btn = document.createElement('button');
+                const navItem = navIcons[i]; const title = langData[currLang].nav[i]; const btn = document.createElement('button');
                 btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-2 hover:bg-white/40`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
-                btn.onclick = () => { 
-                    playSound('click'); 
-                    switchView(navItem.id); 
-                    if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard();
-                    if(navItem.id === 'teacher') initRadarChart();
-                };
+                btn.onclick = () => { playSound('click'); switchView(navItem.id); if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
 
-        window.configureLayout = (role, currentXp = 0) => { 
-            currentRole = role; xp = currentXp || 0; 
-            recalcLevel(xp); changeLang(currLang); 
-            switchView(role === 'student' ? 'dashboard' : 'teacher'); 
-            if(role === 'teacher') setTimeout(initRadarChart, 100);
-        };
-
-        window.switchView = (viewId) => {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            ['view-dashboard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            renderNav(); 
-            if(viewId === 'quiz') startQuiz();
-        };
+        window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } };
+        window.switchView = (viewId) => { document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); ['view-dashboard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); renderNav(); if(viewId === 'quiz') startQuiz(); };
 
         function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
-        
         function loadQuestion() {
             const t = langData[currLang]; const qData = t.quiz;
             if (currentQ >= qData.length) {
-                document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold drop-shadow-sm">恭喜完成！获得 ${gameScore*20} XP！🎉</span>`;
-                document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2 shadow-md hover:shadow-lg">返回主页</button>`;
-                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐";
-                playSound('levelup'); return;
+                document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold drop-shadow-sm">恭喜完成！获得 ${gameScore*20} XP！🎉</span>`; document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2 shadow-md hover:shadow-lg">返回主页</button>`;
+                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐"; playSound('levelup'); return;
             }
-            document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`;
-            document.getElementById('game-question').innerText = qData[currentQ].q;
-            document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md hover:border-indigo-300" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
+            document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`; document.getElementById('game-question').innerText = qData[currentQ].q; document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md hover:border-indigo-300" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
         }
 
         window.checkAnswer = (selectedIdx, btn) => {
-            const t = langData[currLang]; const isCorrect = selectedIdx === t.quiz[currentQ].ans;
-            document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
-            if (isCorrect) {
-                btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20);
-            } else {
-                btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct');
-                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return;
-            }
+            const t = langData[currLang]; const isCorrect = selectedIdx === t.quiz[currentQ].ans; document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
+            if (isCorrect) { btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20); } 
+            else { btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; }
             setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
@@ -361,25 +306,17 @@
 
         window.handleSend = async () => {
             const input = document.getElementById('user-input'); const text = input.value.trim(); if(!text) return; const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML += `<div class="flex items-end gap-2 user-msg flex-row-reverse mb-2"><div class="bubble font-bold shadow-md">${text}</div></div>`;
-            input.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
-            chatBox.innerHTML += `<div id="typing" class="flex items-end gap-2 ai-msg mb-2"><div class="bubble flex items-center h-10 gap-1 px-3 shadow-sm"><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div></div></div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-            try {
-                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用中文简短回答学生：${text}`}) });
-                const data = await res.json(); document.getElementById('typing').remove();
-                chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold shadow-sm">${data.text.replace(/\n/g, '<br>')}</div></div>`;
-                playSound('jump');
-            } catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold text-indigo-700 shadow-sm">这真是一个好问题！关于“${text}”，建议你多查阅课本，或去问问你的华语老师哦！</div></div>`; }
+            chatBox.innerHTML += `<div class="flex items-end gap-2 user-msg flex-row-reverse mb-2"><div class="bubble font-bold shadow-md">${text}</div></div>`; input.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.innerHTML += `<div id="typing" class="flex items-end gap-2 ai-msg mb-2"><div class="bubble flex items-center h-10 gap-1 px-3 shadow-sm"><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div></div></div>`; chatBox.scrollTop = chatBox.scrollHeight;
+            try { const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用中文简短回答学生：${text}`}) }); const data = await res.json(); document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold shadow-sm">${data.text.replace(/\n/g, '<br>')}</div></div>`; playSound('jump'); } 
+            catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold text-indigo-700 shadow-sm">这真是一个好问题！关于“${text}”，建议你多查阅课本，或去问问你的华语老师哦！</div></div>`; }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); switchView('ai'); };
-        document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
+        window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); switchView('ai'); }; document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
 
         window.startVoiceChallenge = () => {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { return Swal.fire('不支持', '您的浏览器不支持语音识别，请使用最新版 Chrome。', 'error'); }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { return Swal.fire('不支持', '您的浏览器不支持语音识别，请使用最新版 Chrome。', 'error'); }
             const recognition = new SpeechRecognition(); recognition.lang = 'zh-CN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
             Swal.fire({ title: '🎤 发音挑战', html: `<p class="text-slate-500 font-bold mb-4">请大声朗读以下词语：</p><div class="text-4xl font-bold text-indigo-700 tracking-widest mb-6">马来西亚</div><div class="w-16 h-16 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl recording-pulse shadow-lg">🎙️</div><p class="text-sm font-bold text-rose-500 mt-4">正在聆听中...</p>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: '取消', allowOutsideClick: false, didOpen: () => { recognition.start(); } });
             recognition.onresult = (event) => { const speechResult = event.results[0][0].transcript.replace(/[。，]/g, ''); if (speechResult.includes('马来西亚') || speechResult.includes('来西亚')) { playSound('correct'); gainXP(30); Swal.fire('发音完美！', `系统听到了：“${speechResult}”<br>+30 XP ⭐`, 'success'); } else { playSound('wrong'); Swal.fire('再试一次', `系统听到了：“${speechResult}”<br>发音不够标准哦，继续加油！`, 'warning'); } };
@@ -396,37 +333,68 @@
         window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
     </script>
 
-    <!-- Firebase 逻辑 -->
+    <!-- Firebase 逻辑 (后台静默心跳、严格双向防越权、界面彻底清理) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
         
         const firebaseConfig = { apiKey: "AIzaSyCq1wRqEta9Ow-q67TOqbz2GnPq-caPuLQ", authDomain: "pandai-bahasa-cina.firebaseapp.com", projectId: "pandai-bahasa-cina", storageBucket: "pandai-bahasa-cina.firebasestorage.app", messagingSenderId: "160554837509", appId: "1:160554837509:web:957d43650afc874e775e6c", measurementId: "G-SPMXMPKVQ2" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         
         let isRegisterMode = false; window.selectedRole = 'student'; 
+        window.activeTimer = null; // 全局计时器
+        
         window.updateFirebaseXP = async (newXP) => { if(auth.currentUser) { await setDoc(doc(db, "users", auth.currentUser.uid), { xp: newXP }, { merge: true }); } };
 
+        // 拉取排行榜与教师数据大屏信息
         window.fetchLeaderboard = async () => {
             const container = document.getElementById('leaderboard-container');
-            container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">正在拉取云端数据...</div>';
+            const teacherTable = document.getElementById('teacher-table-body');
+            if(container) container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">正在拉取云端数据...</div>';
             try {
-                const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(10));
-                const querySnapshot = await getDocs(q); let html = ''; let rank = 1;
+                const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20));
+                const querySnapshot = await getDocs(q); let html = ''; let teacherHtml = ''; let rank = 1;
+                
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data(); if(data.role === 'teacher') return; 
+                    
+                    const userXp = data.xp || 0;
+                    const sec = data.activeSeconds || 0;
+                    const mins = Math.floor(sec / 60); const remainSec = sec % 60;
+                    const timeStr = mins > 0 ? `${mins}分 ${remainSec}秒` : `${sec}秒`;
+                    
+                    // 智能判定学习状态
+                    let statusHtml = '';
+                    if (sec > 300) statusHtml = '<span class="text-green-700 bg-green-100 px-2 py-1 rounded border border-green-300">🌟 勤奋好学</span>';
+                    else if (sec > 60) statusHtml = '<span class="text-blue-700 bg-blue-100 px-2 py-1 rounded border border-blue-300">✅ 正常活跃</span>';
+                    else if (sec > 0) statusHtml = '<span class="text-amber-700 bg-amber-100 px-2 py-1 rounded border border-amber-300">⚠️ 刚起步</span>';
+                    else statusHtml = '<span class="text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-300">💤 潜水摸鱼</span>';
+
                     let medal = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-inner">${rank}</span>`;
-                    if(rank === 1) medal = `<span class="text-3xl drop-shadow-md">🥇</span>`;
-                    if(rank === 2) medal = `<span class="text-3xl drop-shadow-md">🥈</span>`;
-                    if(rank === 3) medal = `<span class="text-3xl drop-shadow-md">🥉</span>`;
-                    html += `<div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors"><div class="flex items-center gap-4"><div class="w-10 flex justify-center">${medal}</div><div class="font-bold text-slate-700">${data.name || '神秘学者'}</div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${data.xp || 0} XP</div></div>`;
+                    if(rank === 1) medal = `<span class="text-3xl drop-shadow-md">🥇</span>`; if(rank === 2) medal = `<span class="text-3xl drop-shadow-md">🥈</span>`; if(rank === 3) medal = `<span class="text-3xl drop-shadow-md">🥉</span>`;
+                    
+                    // 学生排行榜构建
+                    html += `<div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors"><div class="flex items-center gap-4"><div class="w-10 flex justify-center">${medal}</div><div class="font-bold text-slate-700">${data.name || '神秘学者'} <span class="text-xs text-slate-400 font-normal ml-2">在线: ${timeStr}</span></div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div></div>`;
+                    
+                    // 教师数据表格构建
+                    teacherHtml += `<tr class="border-t border-slate-200/60 hover:bg-white/50">
+                        <td class="p-3 font-bold text-slate-700">${data.name || '未命名'}</td>
+                        <td class="p-3 text-indigo-600 font-bold">${userXp} XP</td>
+                        <td class="p-3 text-emerald-600 font-bold">${timeStr}</td>
+                        <td class="p-3 text-center font-bold text-xs">${statusHtml}</td>
+                    </tr>`;
                     rank++;
                 });
-                if(html === '') { html = `<div class="flex items-center justify-between p-4 border-b border-slate-100"><div class="flex items-center gap-4"><div class="w-10 flex justify-center"><span class="text-3xl">🥇</span></div><div class="font-bold text-slate-700">Ali (Mock)</div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">320 XP</div></div>`; }
-                container.innerHTML = html;
-                if(document.getElementById('teacher-table-body')) { document.getElementById('teacher-table-body').innerHTML = `<tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700">李小龙</td><td class="p-3 text-indigo-600 font-bold">280 XP</td><td class="p-3 text-amber-500 font-bold">TP 3</td><td class="p-3 text-center"><button class="text-xs bg-white text-indigo-600 px-2 py-1 rounded border border-indigo-200 font-bold shadow-sm hover:shadow" onclick="generateAI(0)">分析</button></td></tr><tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700">Ali bin Abu</td><td class="p-3 text-indigo-600 font-bold">320 XP</td><td class="p-3 text-purple-500 font-bold">TP 5</td><td class="p-3 text-center"><button class="text-xs bg-white text-indigo-600 px-2 py-1 rounded border border-indigo-200 font-bold shadow-sm hover:shadow" onclick="generateAI(1)">分析</button></td></tr>`; }
-            } catch (error) { container.innerHTML = '<div class="p-8 text-center text-red-400 font-bold">数据同步失败，请检查数据库设置。</div>'; }
+                if(html === '') { 
+                    html = `<div class="p-8 text-center text-slate-500 font-bold">暂无学生数据</div>`; 
+                    teacherHtml = `<tr><td colspan="4" class="p-4 text-center text-slate-400">暂无学生数据</td></tr>`;
+                }
+                if(container) container.innerHTML = html;
+                if(teacherTable) teacherTable.innerHTML = teacherHtml;
+            } catch (error) { 
+                if(container) container.innerHTML = '<div class="p-8 text-center text-red-400 font-bold">数据同步失败，请检查数据库设置。</div>'; 
+            }
         };
 
         window.goToStep2 = (role) => { window.selectedRole = role; document.getElementById('step-1-role').classList.add('hidden'); document.getElementById('step-1-role').classList.remove('flex'); document.getElementById('step-2-auth').classList.remove('hidden'); document.getElementById('step-2-auth').classList.add('flex'); updateAuthUI(); };
@@ -434,24 +402,91 @@
         window.toggleAuthMode = () => { isRegisterMode = !isRegisterMode; updateAuthUI(); };
         function updateAuthUI() { document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录您的专属账号'; document.getElementById('auth-role-title').innerText = window.selectedRole === 'student' ? (isRegisterMode ? '👦 学生注册' : '👦 学生登录') : (isRegisterMode ? '👩‍🏫 教师注册' : '👩‍🏫 教师登录'); }
 
-        function validateDelimaEmail(email, role) { const lowerEmail = email.toLowerCase(); if (isRegisterMode) { if (role === 'teacher' && (!lowerEmail.startsWith('g-') || !lowerEmail.includes('@moe-dl.edu.my'))) { Swal.fire('❌ 权限拒绝', '教师账号必须使用以 "g-" 开头的 DELIMa 邮箱！', 'error'); return false; } else if (role === 'student' && lowerEmail.startsWith('g-')) { Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请返回并以【教师】身份登录！', 'warning'); return false; } } return true; }
+        // ====== 绝对严格的双向拦截系统 ======
+        function validateDelimaEmail(email, role) { 
+            const lowerEmail = email.toLowerCase(); 
+            if (role === 'teacher') {
+                if (!lowerEmail.startsWith('g-') || !lowerEmail.includes('@moe-dl.edu.my')) {
+                    Swal.fire('❌ 权限拒绝', '教师账号必须使用以 "g-" 开头的 DELIMa 邮箱！<br><span class="text-sm text-gray-500">(例如: g-12345@moe-dl.edu.my)</span>', 'error'); return false; 
+                }
+            } else if (role === 'student') {
+                if (lowerEmail.startsWith('g-') && lowerEmail.includes('@moe-dl.edu.my')) {
+                    Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请返回并以【教师】身份登录！', 'warning'); return false; 
+                }
+                if (!lowerEmail.startsWith('m-') || !lowerEmail.includes('@moe-dl.edu.my')) {
+                    Swal.fire('❌ 权限拒绝', '学生账号必须使用以 "m-" 开头的 DELIMa 邮箱！<br><span class="text-sm text-gray-500">(例如: m-12345@moe-dl.edu.my)</span>', 'error'); return false; 
+                }
+            }
+            return true; 
+        }
 
-        window.handleAuth = async (e) => { e.preventDefault(); const email = document.getElementById('auth-email').value; const password = document.getElementById('auth-password').value; const name = document.getElementById('auth-name').value || email.split('@')[0]; if (!validateDelimaEmail(email, window.selectedRole)) return; Swal.fire({ title: '处理中...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); try { let userUid = ""; if (isRegisterMode) { const userCredential = await createUserWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; } else { const userCredential = await signInWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; } await setDoc(doc(db, "users", userUid), { name: name, email: email, role: window.selectedRole }, { merge: true }); Swal.close(); } catch (error) { Swal.fire('错误', error.message.replace('Firebase:', ''), 'error'); } };
+        window.handleAuth = async (e) => { 
+            e.preventDefault(); const email = document.getElementById('auth-email').value; const password = document.getElementById('auth-password').value; const name = document.getElementById('auth-name').value || email.split('@')[0]; 
+            if (!validateDelimaEmail(email, window.selectedRole)) return; 
+            Swal.fire({ title: '处理中...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
+            try { 
+                let userUid = ""; 
+                if (isRegisterMode) { const userCredential = await createUserWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; } 
+                else { const userCredential = await signInWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; } 
+                await setDoc(doc(db, "users", userUid), { name: name, email: email, role: window.selectedRole }, { merge: true }); 
+                Swal.close(); 
+            } catch (error) { Swal.fire('错误', error.message.replace('Firebase:', ''), 'error'); } 
+        };
 
-        window.loginWithGoogle = async () => { const provider = new GoogleAuthProvider(); try { Swal.fire({ title: '连接 Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); const result = await signInWithPopup(auth, provider); if (isRegisterMode && !validateDelimaEmail(result.user.email, window.selectedRole)) { await signOut(auth); return; } await setDoc(doc(db, "users", result.user.uid), { name: result.user.displayName, email: result.user.email, role: window.selectedRole }, { merge: true }); Swal.close(); } catch (error) { if (error.code !== 'auth/popup-closed-by-user') Swal.fire('错误', 'Google 登录失败，请确认白名单设置。', 'error'); } };
+        window.loginWithGoogle = async () => { 
+            const provider = new GoogleAuthProvider(); 
+            try { 
+                Swal.fire({ title: '连接 Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
+                const result = await signInWithPopup(auth, provider); 
+                if (!validateDelimaEmail(result.user.email, window.selectedRole)) { await signOut(auth); return; } 
+                await setDoc(doc(db, "users", result.user.uid), { name: result.user.displayName, email: result.user.email, role: window.selectedRole }, { merge: true }); 
+                Swal.close(); 
+            } catch (error) { if (error.code !== 'auth/popup-closed-by-user') Swal.fire('错误', 'Google 登录失败，请确认白名单设置。', 'error'); } 
+        };
 
         window.resetPassword = async () => { const email = document.getElementById('auth-email').value; if(!email) return Swal.fire('提示', '请先在上方输入您的邮箱', 'info'); try { await sendPasswordResetEmail(auth, email); Swal.fire('已发送', '密码重置链接已发送到您的邮箱', 'success'); } catch (error) { Swal.fire('错误', '发送失败，请确保邮箱正确填写', 'error'); } };
-        window.logout = () => { signOut(auth); goBackToStep1(); };
+        
+        window.logout = async () => { 
+            if(window.activeTimer) clearInterval(window.activeTimer); // 清除静默计时器
+            
+            // 关键修复：点击退出瞬间彻底清理所有内部界面的 DOM 状态，杜绝残影
+            document.getElementById('main-header').classList.add('hidden'); 
+            document.getElementById('main-content').classList.add('hidden');
+            ['view-dashboard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            
+            await signOut(auth); goBackToStep1(); 
+        };
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('login-portal').style.opacity = '0'; setTimeout(() => document.getElementById('login-portal').classList.add('hidden'), 500);
                 const docSnap = await getDoc(doc(db, "users", user.uid));
                 let role = window.selectedRole; let name = user.displayName || user.email.split('@')[0]; let userXp = 0;
-                if (docSnap.exists() && docSnap.data().role) { role = docSnap.data().role; name = docSnap.data().name || name; userXp = docSnap.data().xp || 0; }
-                document.getElementById('user-display-name').innerText = name; document.getElementById('main-header').classList.remove('hidden'); document.getElementById('main-content').classList.remove('hidden');
+                
+                if (docSnap.exists() && docSnap.data().role) { 
+                    role = docSnap.data().role; name = docSnap.data().name || name; userXp = docSnap.data().xp || 0; 
+                }
+                
+                // --- 后台静默心跳：记录活跃时间 ---
+                if (role === 'student') {
+                    if(window.activeTimer) clearInterval(window.activeTimer);
+                    // 每 10 秒自动向云端累加一次学习时间，供老师监控
+                    window.activeTimer = setInterval(async () => {
+                        if (auth.currentUser) {
+                            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                                activeSeconds: increment(10),
+                                lastActive: new Date().getTime()
+                            }).catch(e => console.log('Timer update error')); 
+                        }
+                    }, 10000); 
+                }
+                
+                document.getElementById('user-display-name').innerText = name; 
+                document.getElementById('main-header').classList.remove('hidden'); 
+                document.getElementById('main-content').classList.remove('hidden');
                 window.configureLayout(role, userXp);
             } else {
+                if(window.activeTimer) clearInterval(window.activeTimer);
                 document.getElementById('login-portal').classList.remove('hidden'); document.getElementById('login-portal').style.opacity = '1'; document.getElementById('main-header').classList.add('hidden'); document.getElementById('main-content').classList.add('hidden');
             }
         });
