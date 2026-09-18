@@ -47,7 +47,6 @@
 </head>
 <body class="flex flex-col relative">
 
-    <!-- 全屏登录大厅 -->
     <div id="login-portal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 border-t-2 border-l-2 border-white/80">
             <div id="step-1-role" class="flex flex-col gap-4 text-center">
@@ -90,7 +89,6 @@
         </div>
     </div>
 
-    <!-- 顶部导航 -->
     <header class="glass-panel z-20 flex-shrink-0 m-2 rounded-xl hidden" id="main-header">
         <div class="max-w-7xl mx-auto px-3 h-16 md:h-20 flex items-center justify-between">
             <div class="flex items-center gap-2 md:gap-3">
@@ -98,7 +96,6 @@
                 <div class="flex flex-col">
                     <span class="text-lg md:text-xl font-bold text-slate-800 tracking-wider drop-shadow-sm flex items-center">
                         PandAI <span class="text-indigo-700 text-xs md:text-sm bg-indigo-100/80 px-2 py-0.5 rounded-full shadow-sm mx-1" id="user-display-name">用户</span>
-                        <!-- 🌟 新增：每日打卡火焰徽章 -->
                         <span class="text-orange-600 font-bold text-xs bg-orange-100/90 px-2 py-0.5 rounded-full shadow-sm border border-orange-200" id="user-streak" title="连续登录天数">🔥 1</span>
                     </span>
                     <span id="ui-subtitle" class="text-xs font-bold text-indigo-900/60">KSSR Semakan</span>
@@ -111,14 +108,12 @@
         </div>
     </header>
 
-    <!-- 主界面内容区 -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full px-2 md:px-4 pb-[80px] md:pb-4 gap-4 min-h-0 relative hidden" id="main-content">
         
         <nav class="fixed bottom-0 left-0 w-full glass-panel border-t border-white/50 z-50 flex justify-around p-2 md:relative md:w-72 md:flex-col md:p-4 md:gap-3 md:rounded-2xl" id="sidebar-nav"></nav>
 
         <main class="flex-1 scrollable-area flex flex-col glass-panel rounded-2xl z-10 relative border-t-2 border-l-2 border-white/60">
             
-            <!-- ====== 学生主页区 ====== -->
             <div id="view-dashboard" class="hidden flex-1 p-4 md:p-6 flex flex-col items-center justify-center min-h-[400px]">
                 <div class="bg-gradient-to-b from-white/90 to-white/60 w-full max-w-2xl rounded-3xl p-6 md:p-8 border border-white/80 shadow-lg backdrop-blur-md relative overflow-hidden text-center">
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100/30 to-purple-100/30 pointer-events-none"></div>
@@ -137,13 +132,11 @@
                     <div class="flex flex-wrap justify-center gap-3 mt-6 relative">
                         <button onclick="switchView('quiz')" class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all border border-indigo-400">▶️ 答题测验</button>
                         <button onclick="switchView('roleplay')" class="bg-gradient-to-r from-orange-400 to-amber-500 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#b45309] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 border border-orange-300">🎭 情景对话</button>
-                        <!-- 🌟 新增的杀手锏入口：翻转记忆卡 -->
                         <button onclick="switchView('flashcard')" class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#0f766e] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 border border-teal-400">🎴 翻转记忆卡</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ====== 新增：3D 翻转记忆卡 (Flashcard) ====== -->
             <div id="view-flashcard" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-white/30 scrollable-area relative">
                 <div class="text-center mb-6 mt-4">
                     <h2 class="text-2xl md:text-3xl font-bold text-slate-800 drop-shadow-sm">🎴 智能记忆卡</h2>
@@ -151,17 +144,13 @@
                 </div>
                 
                 <div class="flex-1 flex flex-col items-center justify-center w-full pb-8">
-                    <!-- 3D 卡片容器 -->
                     <div class="flashcard" id="fc-card" onclick="flipFlashcard()">
                         <div class="flashcard-inner">
-                            <!-- 正面 (中文) -->
                             <div class="flashcard-front">
                                 <span class="text-sm text-slate-400 font-bold absolute top-4">中文生字</span>
                                 <div class="text-5xl md:text-6xl font-bold text-indigo-700 tracking-widest" id="fc-zh">学校</div>
-                                <!-- 🔊 AI朗读小喇叭 -->
                                 <button onclick="event.stopPropagation(); window.speakText(document.getElementById('fc-zh').innerText)" class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-xl shadow-sm border border-indigo-100 hover:bg-indigo-100">🔊</button>
                             </div>
-                            <!-- 背面 (拼音与马来文) -->
                             <div class="flashcard-back">
                                 <span class="text-sm text-indigo-400 font-bold absolute top-4">Pinyin & BM</span>
                                 <div class="text-3xl font-bold text-slate-700 mb-2" id="fc-py">xué xiào</div>
@@ -179,7 +168,6 @@
                 </div>
             </div>
 
-            <!-- ====== 沉浸式情景对话区 ====== -->
             <div id="view-roleplay" class="hidden flex-1 flex flex-col bg-white/30 relative">
                 <div class="bg-white/80 border-b border-white/50 py-2 px-3 flex justify-between items-center shadow-sm z-10 shrink-0 backdrop-blur-md">
                     <button onclick="switchView('dashboard')" class="text-indigo-600 font-bold flex items-center gap-1 bg-white/50 px-2 py-1 rounded-lg hover:bg-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 返回</button>
@@ -207,21 +195,18 @@
                 </div>
             </div>
 
-            <!-- ====== 学生游戏答题区 ====== -->
             <div id="view-quiz" class="hidden flex-1 p-4 md:p-6 bg-white/30 relative min-h-[400px]">
                 <div class="absolute top-4 right-4 bg-white/90 border-2 border-amber-300 px-3 py-1 rounded-xl text-amber-500 font-bold text-lg shadow-sm z-20 backdrop-blur-sm">⭐ <span id="game-score">0</span></div>
                 <div class="w-full max-w-3xl mx-auto pt-10 pb-6 flex flex-col items-center">
                     <div class="bg-white/90 p-6 rounded-3xl mb-6 text-center relative w-full border border-white shadow-lg backdrop-blur-md">
                         <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm md:text-lg px-4 py-1 rounded-full shadow-md border border-white/30"><span id="ui-q-prefix">第</span> <span id="q-num">1/5</span> <span id="ui-q-suffix">题</span></div>
                         <h3 id="game-question" class="text-xl md:text-2xl font-bold text-slate-800 mt-4 leading-relaxed">加载中...</h3>
-                        <!-- 🌟 题目朗读按钮 -->
                         <button onclick="window.speakText(document.getElementById('game-question').innerText)" class="absolute bottom-2 right-2 w-8 h-8 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-sm shadow-sm border border-indigo-100 hover:bg-indigo-100">🔊</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full" id="game-options"></div>
                 </div>
             </div>
 
-            <!-- 全服排行榜 -->
             <div id="view-leaderboard" class="hidden flex-1 p-4 md:p-6 bg-white/30 scrollable-area">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl md:text-3xl font-bold text-slate-800 flex justify-center items-center gap-2 drop-shadow-sm">🏆 全服荣誉榜</h2>
@@ -232,7 +217,6 @@
                 </div>
             </div>
 
-            <!-- AI 聊天区 -->
             <div id="view-ai" class="hidden flex-1 flex flex-col bg-white/30">
                 <div class="bg-white/80 border-b border-white/50 py-2 px-3 text-center shadow-sm z-10 shrink-0 backdrop-blur-md">
                     <span class="text-lg font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 万能 Gemini 学习助手</span>
@@ -255,7 +239,6 @@
                 </div>
             </div>
 
-            <!-- 教师数据中心区 -->
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-white/30 scrollable-area">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 drop-shadow-sm">📊 教师数据大屏</h2>
@@ -295,7 +278,6 @@
         </main>
     </div>
 
-    <!-- UI, 游戏, AI, 语音朗读, 记忆卡逻辑 -->
     <script>
         const langData = {
             zh: { nav: ['主页', '答题', '排行榜', 'AI助手', '大屏数据'], aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'],
@@ -311,39 +293,27 @@
         // --- 🌟 原生 AI 语音朗读引擎 (Text-to-Speech) ---
         window.speakText = (text) => {
             if(!window.speechSynthesis) return Swal.fire('不支持', '浏览器不支持语音朗读功能', 'error');
-            // 过滤掉不可读的标签字符
             const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/BM:.*$/i, ''); 
             const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'zh-CN'; utterance.rate = 0.9; utterance.pitch = 1.1; // 微调语速和语调让其更自然
+            utterance.lang = 'zh-CN'; utterance.rate = 0.9; utterance.pitch = 1.1; 
             window.speechSynthesis.speak(utterance);
         };
 
         // --- 🌟 翻转记忆卡组数据与逻辑 ---
-        const flashcardsData = [
-            { zh: '学校', py: 'xué xiào', ms: 'Sekolah' },
-            { zh: '老师', py: 'lǎo shī', ms: 'Cikgu / Guru' },
-            { zh: '朋友', py: 'péng yǒu', ms: 'Kawan' },
-            { zh: '学习', py: 'xué xí', ms: 'Belajar' },
-            { zh: '马来西亚', py: 'mǎ lái xī yà', ms: 'Malaysia' }
-        ];
+        const flashcardsData = [ { zh: '学校', py: 'xué xiào', ms: 'Sekolah' }, { zh: '老师', py: 'lǎo shī', ms: 'Cikgu / Guru' }, { zh: '朋友', py: 'péng yǒu', ms: 'Kawan' }, { zh: '学习', py: 'xué xí', ms: 'Belajar' }, { zh: '马来西亚', py: 'mǎ lái xī yà', ms: 'Malaysia' } ];
         let currentCardIdx = 0;
         
         function loadFlashcard() {
-            const card = flashcardsData[currentCardIdx];
-            document.getElementById('fc-card').classList.remove('flipped'); // 切换卡片时恢复正面
+            const card = flashcardsData[currentCardIdx]; document.getElementById('fc-card').classList.remove('flipped');
             setTimeout(() => {
-                document.getElementById('fc-zh').innerText = card.zh;
-                document.getElementById('fc-py').innerText = card.py;
-                document.getElementById('fc-ms').innerText = card.ms;
-                document.getElementById('fc-current').innerText = currentCardIdx + 1;
-                document.getElementById('fc-total').innerText = flashcardsData.length;
-            }, 150); // 等待翻转动画回正后再替换文字，体验更好
+                document.getElementById('fc-zh').innerText = card.zh; document.getElementById('fc-py').innerText = card.py; document.getElementById('fc-ms').innerText = card.ms;
+                document.getElementById('fc-current').innerText = currentCardIdx + 1; document.getElementById('fc-total').innerText = flashcardsData.length;
+            }, 150); 
         }
         window.flipFlashcard = () => { document.getElementById('fc-card').classList.toggle('flipped'); playSound('click'); };
         window.nextFlashcard = () => { currentCardIdx = (currentCardIdx + 1) % flashcardsData.length; loadFlashcard(); playSound('click'); };
         window.prevFlashcard = () => { currentCardIdx = (currentCardIdx - 1 + flashcardsData.length) % flashcardsData.length; loadFlashcard(); playSound('click'); };
-        // 初始化载入第一张卡片
-        loadFlashcard();
+        loadFlashcard(); // Init
 
         async function initAudio() {
             if (isAudioInit) return; await Tone.start(); Tone.Destination.mute = false;
@@ -352,11 +322,14 @@
         }
         function toggleAudio() { if (!isAudioInit) { initAudio(); return; } Tone.Destination.mute = !Tone.Destination.mute; document.getElementById('sound-icon').innerText = Tone.Destination.mute ? "🔇" : "🔊"; }
         function playSound(type) {
-            if (!isAudioInit || Tone.Destination.mute) return; const now = Tone.now();
-            if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
-            if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
-            if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
-            if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
+            if (!isAudioInit || Tone.Destination.mute || !synths.click) return; 
+            try {
+                const now = Tone.now();
+                if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
+                if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
+                if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
+                if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
+            } catch(e) { console.log('Audio blocked', e); }
         }
 
         window.changeLang = (lang) => {
@@ -371,17 +344,41 @@
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
             const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 3]; 
             allowedIndices.forEach(i => {
-                const navItem = navIcons[i]; const title = langData.zh.nav[i]; const btn = document.createElement('button');
+                const navItem = navIcons[i]; const title = langData.zh.nav[i]; 
+                const btn = document.createElement('button');
+                btn.setAttribute('data-target', navItem.id); // 🌟 核心修复点：为按钮绑定目标视图标识
                 btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-2 hover:bg-white/40`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
-                btn.onclick = () => { playSound('click'); switchView(navItem.id); if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } };
+                
+                btn.onclick = () => { 
+                    playSound('click'); 
+                    switchView(navItem.id); 
+                    if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); 
+                    if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } 
+                };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
 
         window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } };
-        window.switchView = (viewId) => { document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); renderNav(); if(viewId === 'quiz') startQuiz(); };
+        
+        window.switchView = (viewId) => { 
+            // 🌟 核心修复点：安全切换类名，绝不再销毁和重建底部导航栏的 DOM！
+            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => {
+                const el = document.getElementById(id); if(el) el.classList.add('hidden');
+            }); 
+            const targetEl = document.getElementById(`view-${viewId}`);
+            if(targetEl) targetEl.classList.remove('hidden'); 
+            
+            // 安全更新导航栏高亮状态
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-target') === viewId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            if(viewId === 'quiz') startQuiz(); 
+        };
 
         function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
         function loadQuestion() {
@@ -415,8 +412,6 @@
                 
                 let formattedText = data.text.replace(/\n/g, '<br>');
                 if(formattedText.includes('BM:') || formattedText.includes('Bahasa')) { formattedText = formattedText.replace(/(BM:|Bahasa Melayu:)(.*)/ig, '<span class="text-xs text-orange-600 mt-1 block border-t border-orange-100 pt-1">$1$2</span>'); }
-                
-                // 给生成的回复动态绑定 TTS 朗读事件
                 const safeReadText = data.text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
                 chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 relative pr-10">${formattedText}<button onclick="window.speakText('${safeReadText}')" class="absolute top-2 right-2 text-xl opacity-60 hover:opacity-100">🔊</button></div></div>`; 
                 playSound('jump'); gainXP(10); 
@@ -457,7 +452,6 @@
         window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
     </script>
 
-    <!-- Firebase 逻辑 (含每日打卡计算、后台计时、拦截、重置清理) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
@@ -481,7 +475,7 @@
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data(); if(data.role === 'teacher') return; 
                     const userXp = data.xp || 0; const sec = data.activeSeconds || 0; const mins = Math.floor(sec / 60); const remainSec = sec % 60; const timeStr = mins > 0 ? `${mins}分 ${remainSec}秒` : `${sec}秒`;
-                    const userStreak = data.streak || 1; // 抓取打卡天数
+                    const userStreak = data.streak || 1;
                     
                     let statusHtml = '';
                     if (sec > 300) statusHtml = '<span class="text-green-700 bg-green-100 px-2 py-1 rounded border border-green-300">🌟 勤奋好学</span>';
@@ -493,7 +487,6 @@
                     if(rank === 1) medal = `<span class="text-3xl drop-shadow-md">🥇</span>`; if(rank === 2) medal = `<span class="text-3xl drop-shadow-md">🥈</span>`; if(rank === 3) medal = `<span class="text-3xl drop-shadow-md">🥉</span>`;
                     
                     html += `<div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors"><div class="flex items-center gap-4"><div class="w-10 flex justify-center">${medal}</div><div class="font-bold text-slate-700">${data.name || '神秘学者'} <span class="text-xs text-orange-500 ml-1">🔥${userStreak}</span> <span class="text-xs text-slate-400 font-normal ml-2">在线: ${timeStr}</span></div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div></div>`;
-                    // 教师表格里展示连续打卡天数
                     teacherHtml += `<tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700">${data.name || '未命名'}</td><td class="p-3 text-indigo-600 font-bold">${userXp} XP</td><td class="p-3 text-emerald-600 font-bold">${timeStr}</td><td class="p-3 text-center font-bold text-orange-500">🔥 ${userStreak} 天</td></tr>`;
                     rank++;
                 });
@@ -561,23 +554,16 @@
                 
                 if (docSnap.exists()) { 
                     const data = docSnap.data();
-                    if(data.role) role = data.role; 
-                    if(data.name) name = data.name; 
-                    if(data.xp) userXp = data.xp; 
+                    if(data.role) role = data.role; if(data.name) name = data.name; if(data.xp) userXp = data.xp; 
                     
-                    // --- 🌟 核心：每日打卡计算逻辑 ---
-                    const todayDateStr = new Date().toDateString(); // e.g., "Wed Sep 18 2026"
-                    streak = data.streak || 1;
-                    const lastLogin = data.lastLoginDate || "";
-                    
+                    const todayDateStr = new Date().toDateString();
+                    streak = data.streak || 1; const lastLogin = data.lastLoginDate || "";
                     if (lastLogin !== todayDateStr) {
-                        // 简单处理：只要今天还没登，天数就+1 (在生产环境会更严谨检查是否是"昨天")
                         streak = lastLogin === "" ? 1 : streak + 1;
                         await updateDoc(doc(db, "users", user.uid), { lastLoginDate: todayDateStr, streak: streak }).catch(e => console.log(e));
                     }
                 }
                 
-                // 将算出的 Streak 更新到顶部导航栏
                 document.getElementById('user-streak').innerText = `🔥 ${streak}`;
                 
                 if (role === 'student') {
