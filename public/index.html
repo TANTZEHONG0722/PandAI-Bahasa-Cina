@@ -22,11 +22,12 @@
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
         .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
-        /* 🌟 游戏化宠物专属动画 */
+        /* 🌟 悬浮动画增强 */
         .pet-float { animation: floatAnim 3s ease-in-out infinite; }
-        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .avatar-float { animation: floatAnim 3.5s ease-in-out infinite; } /* 稍微错开时间，显得自然 */
         .pet-jump { animation: jumpAnim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        @keyframes jumpAnim { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.1); } }
+        @keyframes jumpAnim { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-25px) scale(1.1); } }
         .pet-shake { animation: shakeAnim 0.5s; }
         @keyframes shakeAnim { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-5deg); } 75% { transform: translateX(10px) rotate(5deg); } }
         
@@ -49,6 +50,11 @@
         .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.8); }
         .flashcard-front { background: linear-gradient(135deg, #ffffff, #f8fafc); }
         .flashcard-back { background: linear-gradient(135deg, #e0e7ff, #ffffff); transform: rotateY(180deg); border-color: #c7d2fe; }
+
+        /* 捏脸面板的选项按钮 */
+        .avatar-opt-btn { flex-shrink: 0; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; background: white; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; font-weight: bold; color: #475569; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .avatar-opt-btn:hover { border-color: #818cf8; background: #e0e7ff; }
+        .avatar-opt-btn.selected { border-color: #4f46e5; background: #4f46e5; color: white; }
     </style>
 </head>
 <body class="flex flex-col relative">
@@ -125,33 +131,37 @@
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100/30 to-purple-100/30 pointer-events-none"></div>
                     <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-200 to-yellow-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-amber-300" id="pet-level-badge">Lv. 1</span>
                     
-                    <h3 id="ui-pet-title" class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 relative">我的学习萌宠</h3>
-                    
                     <div class="flex flex-col items-center gap-2 mb-6 relative">
-                        <span class="text-sm font-bold text-slate-500" id="ui-xp-label">XP: <span id="xp-text" class="text-indigo-600">0/50</span></span>
-                        <div class="w-40 md:w-48 h-3 bg-slate-200/80 rounded-full overflow-hidden border border-slate-300/50 shadow-inner">
+                        <span class="text-sm font-bold text-slate-500" id="ui-xp-label">总经验值 XP: <span id="xp-text" class="text-indigo-600">0/50</span></span>
+                        <div class="w-48 md:w-64 h-3 bg-slate-200/80 rounded-full overflow-hidden border border-slate-300/50 shadow-inner">
                             <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 transition-all duration-700" style="width: 0%"></div>
                         </div>
                     </div>
                     
-                    <div class="relative w-full max-w-sm mx-auto mb-6 flex flex-col items-center">
-                        <div id="pet-speech-bubble" class="absolute -top-12 opacity-0 transition-opacity duration-300 bg-white px-5 py-2 rounded-2xl shadow-lg border border-indigo-100 text-sm font-bold text-indigo-600 z-20 whitespace-nowrap">
-                            主人，今天学点什么呀？
-                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-indigo-100 transform rotate-45"></div>
-                        </div>
+                    <div class="flex justify-center items-end gap-6 md:gap-12 mb-6 relative select-none">
                         
-                        <div class="relative group cursor-pointer" onclick="interactPet('touch')">
-                            <div class="text-8xl md:text-9xl relative z-10 pet-float drop-shadow-2xl transition-transform duration-300 group-hover:scale-110" id="pet-emoji">🥚</div>
-                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-8 bg-indigo-500/20 rounded-[100%] blur-md -z-10 group-hover:bg-indigo-400/40 transition-all"></div>
-                            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 w-20 h-3 bg-gradient-to-r from-indigo-300 to-purple-300 rounded-[100%] opacity-60 shadow-[0_0_15px_rgba(99,102,241,0.6)] -z-10"></div>
+                        <div class="flex flex-col items-center relative z-10 group">
+                            <div class="bg-indigo-600 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full absolute -top-4 shadow-md z-20 transition-all group-hover:-translate-y-1">我的分身</div>
+                            <div class="w-24 h-24 md:w-32 md:h-32 bg-indigo-50/80 border-4 border-white shadow-lg rounded-full overflow-hidden avatar-float transition-transform group-hover:scale-105 cursor-pointer" onclick="openAvatarBuilder()">
+                                <img id="student-avatar-img" src="https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=ffdbb4&top=shortHairShortFlat&clothing=hoodie" class="w-full h-full object-cover">
+                            </div>
+                            <div class="w-16 h-3 bg-indigo-500/20 rounded-[100%] blur-[4px] mt-2 group-hover:bg-indigo-400/40 transition-all"></div>
+                            <button onclick="openAvatarBuilder()" class="mt-2 bg-white/90 border border-slate-200 text-slate-600 text-[10px] md:text-xs px-3 py-1 rounded-full font-bold shadow-sm hover:text-indigo-600 hover:border-indigo-300 transition-all active:scale-95">🧑‍🎨 捏脸换装</button>
                         </div>
-                    </div>
 
-                    <h4 id="pet-name" class="text-2xl font-bold text-indigo-700 mt-2 relative drop-shadow-sm">灵力蛋</h4>
-                    
-                    <div class="flex justify-center gap-3 mt-4 mb-6 relative">
-                        <button onclick="interactPet('feed')" class="bg-white/80 hover:bg-white border-2 border-rose-200 text-rose-500 px-4 py-2 rounded-full font-bold text-sm shadow-sm transition-transform active:scale-95 flex items-center gap-1"><span class="text-lg">🍎</span> 喂食 (+2 XP)</button>
-                        <button onclick="interactPet('play')" class="bg-white/80 hover:bg-white border-2 border-amber-200 text-amber-500 px-4 py-2 rounded-full font-bold text-sm shadow-sm transition-transform active:scale-95 flex items-center gap-1"><span class="text-lg">🎾</span> 玩耍</button>
+                        <div class="flex flex-col items-center relative z-10 cursor-pointer group" onclick="interactPet('touch')">
+                            <div id="pet-speech-bubble" class="absolute -top-12 opacity-0 transition-opacity duration-300 bg-white px-4 py-2 rounded-2xl shadow-lg border border-orange-100 text-xs font-bold text-orange-600 z-20 whitespace-nowrap">
+                                主人，陪我玩~
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b border-r border-orange-100 transform rotate-45"></div>
+                            </div>
+                            <div class="text-7xl md:text-8xl pet-float transition-transform group-hover:scale-110 drop-shadow-2xl" id="pet-emoji">🥚</div>
+                            <div class="w-16 h-3 bg-amber-500/20 rounded-[100%] blur-[4px] mt-2 group-hover:bg-amber-400/40 transition-all"></div>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="event.stopPropagation(); interactPet('feed')" class="bg-white/90 border border-rose-100 text-rose-500 text-[10px] md:text-xs px-2 py-1 rounded-full font-bold shadow-sm hover:bg-rose-50 active:scale-95 transition-all">🍎 喂食</button>
+                                <button onclick="event.stopPropagation(); interactPet('play')" class="bg-white/90 border border-amber-100 text-amber-500 text-[10px] md:text-xs px-2 py-1 rounded-full font-bold shadow-sm hover:bg-amber-50 active:scale-95 transition-all">🎾 玩耍</button>
+                            </div>
+                        </div>
+
                     </div>
                     
                     <div class="h-px w-3/4 mx-auto bg-slate-200/50 my-6 relative"></div>
@@ -353,49 +363,118 @@
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
-        // 🌟 宠物养成系统核心交互逻辑
-        const petDialogues = ["主人，今天也要加油哦！", "知识就是力量！", "我好饿，快去答题赚XP喂我~", "摸摸我的头，好开心呀~", "你是我最棒的主人！"];
-        window.interactPet = (action) => {
-            playSound('jump');
-            const pet = document.getElementById('pet-emoji');
-            
-            // 触发动态跳跃动画
-            pet.classList.remove('pet-float');
-            pet.classList.add('pet-jump');
-            setTimeout(() => {
-                pet.classList.remove('pet-jump');
-                pet.classList.add('pet-float');
-            }, 500);
-
-            if(action === 'feed') {
-                showPetSpeech("吧唧吧唧...好美味！谢谢主人~ ❤️");
-                gainXP(2); // 喂食获得微量奖励
-            } else if(action === 'play') {
-                showPetSpeech("哈哈哈好痒好开心！😆");
-            } else {
-                showPetSpeech(petDialogues[Math.floor(Math.random() * petDialogues.length)]);
-            }
+        // ====== ✨ 核心：数字分身 Avatar Builder 逻辑 ======
+        // 默认形象配置
+        window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' };
+        
+        // 构建 API URL
+        window.getAvatarUrl = (config) => {
+            return `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${config.skinColor}&top=${config.top}&clothing=${config.clothing}`;
         };
 
+        // 更新界面上的头像
+        window.updateAvatarUI = () => {
+            const url = getAvatarUrl(window.avatarConfig);
+            const img = document.getElementById('student-avatar-img');
+            if(img) img.src = url;
+        };
+
+        // 打开捏脸中心
+        window.openAvatarBuilder = () => {
+            let tempConfig = { ...window.avatarConfig };
+            playSound('click');
+
+            // 选项数据
+            const skins = [
+                { val: 'ffdbb4', label: '白皙 ✋🏻' }, { val: 'edb98a', label: '自然 ✋🏼' }, 
+                { val: 'd08b5b', label: '小麦 ✋🏽' }, { val: 'ae5d29', label: '深色 ✋🏾' }
+            ];
+            const tops = [
+                { val: 'shortHairShortFlat', label: '清爽短发' }, { val: 'shortHairShortCurly', label: '卷短发' }, 
+                { val: 'shortHairSides', label: '两边剃短' }, { val: 'longHairStraight', label: '飘逸长发' }, 
+                { val: 'longHairBob', label: '波波头' }, { val: 'longHairCurly', label: '波浪长卷' }, 
+                { val: 'hijab', label: '头巾 Hijab' }, { val: 'turban', label: '包头 Turban' }
+            ];
+            const clothes = [
+                { val: 'hoodie', label: '连帽衫' }, { val: 'blazerAndShirt', label: '校服衬衫' }, 
+                { val: 'collarAndSweater', label: '毛衣领' }, { val: 'graphicShirt', label: 'T恤衫' }, 
+                { val: 'overall', label: '背心外套' }
+            ];
+
+            // 生成选项 HTML
+            const renderBtns = (key, arr) => arr.map(item => `
+                <button onclick="window.setTempAvatar('${key}', '${item.val}')" class="avatar-opt-btn ${tempConfig[key] === item.val ? 'selected' : ''}" id="btn-${key}-${item.val}">
+                    ${item.label}
+                </button>
+            `).join('');
+
+            Swal.fire({
+                title: '🧑‍🎨 捏脸换装中心',
+                html: `
+                    <div class="flex flex-col items-center w-full max-w-sm mx-auto">
+                        <div class="w-32 h-32 bg-indigo-50 border-4 border-white shadow-lg rounded-full overflow-hidden mb-6 avatar-float">
+                            <img id="swal-avatar-preview" src="${getAvatarUrl(tempConfig)}" class="w-full h-full object-cover">
+                        </div>
+                        
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择肤色 (Skin):</div>
+                        <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-skinColor">${renderBtns('skinColor', skins)}</div>
+
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择发型 (Hair):</div>
+                        <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-top">${renderBtns('top', tops)}</div>
+
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择服装 (Clothes):</div>
+                        <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-clothing">${renderBtns('clothing', clothes)}</div>
+                    </div>
+                `,
+                showCancelButton: true, confirmButtonText: '✅ 保存形象', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', width: '500px',
+                didOpen: () => {
+                    // SWAL 内部交互逻辑
+                    window.setTempAvatar = (key, val) => {
+                        tempConfig[key] = val;
+                        document.getElementById('swal-avatar-preview').src = getAvatarUrl(tempConfig);
+                        // 更新按钮选中状态
+                        const group = document.getElementById(`opt-grp-${key}`);
+                        if(group) {
+                            group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                            const selectedBtn = document.getElementById(`btn-${key}-${val}`);
+                            if(selectedBtn) selectedBtn.classList.add('selected');
+                        }
+                    };
+                }
+            }).then(async (res) => {
+                if (res.isConfirmed) {
+                    window.avatarConfig = { ...tempConfig };
+                    window.updateAvatarUI();
+                    Swal.fire({title: '保存成功', text: '你的新形象真好看！', icon: 'success', timer: 1500, showConfirmButton: false});
+                    
+                    // 存储到云端
+                    if (window.saveAvatarToFirebase) window.saveAvatarToFirebase(window.avatarConfig);
+                }
+            });
+        };
+
+        // ====== 宠物交互与系统基础功能 ======
+        const petDialogues = ["主人，今天也要加油哦！", "知识就是力量！", "多带我出去兜风好不好~", "摸摸我的头，好开心呀~", "你是我最棒的主人！"];
+        window.interactPet = (action) => {
+            playSound('jump'); const pet = document.getElementById('pet-emoji');
+            pet.classList.remove('pet-float'); pet.classList.add('pet-jump'); setTimeout(() => { pet.classList.remove('pet-jump'); pet.classList.add('pet-float'); }, 500);
+            if(action === 'feed') { showPetSpeech("吧唧吧唧...好美味！谢谢主人~ ❤️"); gainXP(2); } 
+            else if(action === 'play') { showPetSpeech("哈哈哈好痒好开心！😆"); } 
+            else { showPetSpeech(petDialogues[Math.floor(Math.random() * petDialogues.length)]); }
+        };
         window.showPetSpeech = (text) => {
             const bubble = document.getElementById('pet-speech-bubble');
-            bubble.innerHTML = `${text} <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-indigo-100 transform rotate-45"></div>`;
-            bubble.classList.remove('opacity-0');
-            // 3秒后自动隐藏
-            setTimeout(() => bubble.classList.add('opacity-0'), 3000);
+            bubble.innerHTML = `${text} <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b border-r border-orange-100 transform rotate-45"></div>`;
+            bubble.classList.remove('opacity-0'); setTimeout(() => bubble.classList.add('opacity-0'), 3000);
         };
 
         window.speakText = (text) => {
             if(!window.speechSynthesis) return Swal.fire('不支持', '浏览器不支持语音朗读功能', 'error');
             const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/BM:.*$/i, ''); 
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'zh-CN'; utterance.rate = 0.9; utterance.pitch = 1.1; 
+            const utterance = new SpeechSynthesisUtterance(cleanText); utterance.lang = 'zh-CN'; utterance.rate = 0.9; utterance.pitch = 1.1; 
             window.speechSynthesis.speak(utterance);
         };
 
-        const flashcardsData = [ { zh: '学校', py: 'xué xiào', ms: 'Sekolah' }, { zh: '老师', py: 'lǎo shī', ms: 'Cikgu / Guru' }, { zh: '朋友', py: 'péng yǒu', ms: 'Kawan' }, { zh: '学习', py: 'xué xí', ms: 'Belajar' }, { zh: '马来西亚', py: 'mǎ lái xī yà', ms: 'Malaysia' } ];
-        let currentCardIdx = 0;
-        
         function loadFlashcard() {
             const card = flashcardsData[currentCardIdx]; document.getElementById('fc-card').classList.remove('flipped');
             setTimeout(() => {
@@ -416,18 +495,11 @@
         function toggleAudio() { if (!isAudioInit) { initAudio(); return; } Tone.Destination.mute = !Tone.Destination.mute; document.getElementById('sound-icon').innerText = Tone.Destination.mute ? "🔇" : "🔊"; }
         function playSound(type) {
             if (!isAudioInit || Tone.Destination.mute || !synths.click) return; 
-            try {
-                const now = Tone.now();
-                if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
-                if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
-                if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
-                if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
-            } catch(e) { console.log('Audio blocked', e); }
+            try { const now = Tone.now(); if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now); if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); } if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now); if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); } } catch(e) { console.log('Audio blocked'); }
         }
 
         window.changeLang = (lang) => {
-            currLang = lang; const t = langData.zh;
-            document.getElementById('xp-text').innerText = `${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}`;
+            currLang = lang; const t = langData.zh; document.getElementById('xp-text').innerText = `${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}`;
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white/90 border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">${p}</button>`; });
             renderNav(); if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
@@ -437,36 +509,22 @@
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
             const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 3]; 
             allowedIndices.forEach(i => {
-                const navItem = navIcons[i]; const title = langData.zh.nav[i]; 
-                const btn = document.createElement('button');
+                const navItem = navIcons[i]; const title = langData.zh.nav[i]; const btn = document.createElement('button');
                 btn.setAttribute('data-target', navItem.id); 
                 btn.className = `nav-btn flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-2 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-3 hover:bg-white/70 transition-all`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
-                
-                btn.onclick = () => { 
-                    playSound('click'); switchView(navItem.id); 
-                    if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); 
-                    if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } 
-                };
+                btn.onclick = () => { playSound('click'); switchView(navItem.id); if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
 
-        window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } };
+        window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } window.updateAvatarUI(); };
         
         window.switchView = (viewId) => { 
-            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => {
-                const el = document.getElementById(id); if(el) el.classList.add('hidden');
-            }); 
-            const targetEl = document.getElementById(`view-${viewId}`);
-            if(targetEl) targetEl.classList.remove('hidden'); 
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if (btn.getAttribute('data-target') === viewId) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            
+            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }); 
+            const targetEl = document.getElementById(`view-${viewId}`); if(targetEl) targetEl.classList.remove('hidden'); 
+            document.querySelectorAll('.nav-btn').forEach(btn => { if (btn.getAttribute('data-target') === viewId) btn.classList.add('active'); else btn.classList.remove('active'); });
             if(viewId === 'quiz') startQuiz(); 
         };
 
@@ -475,9 +533,7 @@
             const t = langData.zh; const qData = t.quiz;
             if (currentQ >= qData.length) {
                 document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold drop-shadow-sm">恭喜完成！获得 ${gameScore*20} XP！🎉</span>`; document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2 shadow-md hover:shadow-lg border-indigo-200">返回主页</button>`;
-                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐"; playSound('levelup'); 
-                showPetSpeech(`哇！完成了测验！获得了 ${gameScore*20} XP！`); // 答题完给宠物反馈
-                return;
+                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐"; playSound('levelup'); showPetSpeech(`哇！完成了测验！获得了 ${gameScore*20} XP！`); return;
             }
             document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`; document.getElementById('game-question').innerText = qData[currentQ].q; document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md hover:border-indigo-300" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
         }
@@ -485,11 +541,7 @@
         window.checkAnswer = (selectedIdx, btn) => {
             const t = langData.zh; const isCorrect = selectedIdx === t.quiz[currentQ].ans; document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) { btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20); } 
-            else { 
-                btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); 
-                const pet = document.getElementById('pet-emoji'); pet.classList.add('pet-shake'); setTimeout(()=>pet.classList.remove('pet-shake'), 500); // 答错时宠物摇头
-                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; 
-            }
+            else { btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); const pet = document.getElementById('pet-emoji'); pet.classList.add('pet-shake'); setTimeout(()=>pet.classList.remove('pet-shake'), 500); setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; }
             setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
@@ -503,16 +555,11 @@
             chatBox.innerHTML += `<div id="rp-typing" class="flex items-end gap-2 ai-msg mb-2"><div class="bubble flex items-center h-10 gap-1 px-3 shadow-sm bg-white/90 border border-orange-100"><div class="w-2 h-2 bg-orange-300 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-orange-300 rounded-full animate-pulse" style="animation-delay: 150ms"></div></div></div>`; chatBox.scrollTop = chatBox.scrollHeight;
             try { 
                 const prompt = `你是马来西亚学校食堂的马来安娣(Makcik)，卖椰浆饭。学生对你说："${text}"。请用简单热情的中文回复他，如果学生有语病请温柔指出。最后另起一行附上这句回复的马来文(Bahasa Melayu)翻译。字数60以内。`;
-                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: prompt}) }); 
-                const data = await res.json(); document.getElementById('rp-typing').remove(); 
-                
-                let formattedText = data.text.replace(/\n/g, '<br>');
-                if(formattedText.includes('BM:') || formattedText.includes('Bahasa')) { formattedText = formattedText.replace(/(BM:|Bahasa Melayu:)(.*)/ig, '<span class="text-xs text-orange-600 mt-1 block border-t border-orange-100 pt-1">$1$2</span>'); }
+                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: prompt}) }); const data = await res.json(); document.getElementById('rp-typing').remove(); 
+                let formattedText = data.text.replace(/\n/g, '<br>'); if(formattedText.includes('BM:') || formattedText.includes('Bahasa')) { formattedText = formattedText.replace(/(BM:|Bahasa Melayu:)(.*)/ig, '<span class="text-xs text-orange-600 mt-1 block border-t border-orange-100 pt-1">$1$2</span>'); }
                 const safeReadText = data.text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
-                chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 relative pr-10">${formattedText}<button onclick="window.speakText('${safeReadText}')" class="absolute top-2 right-2 text-xl opacity-60 hover:opacity-100">🔊</button></div></div>`; 
-                playSound('jump'); gainXP(10); showPetSpeech('完成了一次对话！太棒啦！'); 
-            } 
-            catch(e) { document.getElementById('rp-typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 text-orange-600">Aiya! 安娣没听清楚，你可以再说一次吗？</div></div>`; }
+                chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 relative pr-10">${formattedText}<button onclick="window.speakText('${safeReadText}')" class="absolute top-2 right-2 text-xl opacity-60 hover:opacity-100">🔊</button></div></div>`; playSound('jump'); gainXP(10); showPetSpeech('完成了一次对话！太棒啦！'); 
+            } catch(e) { document.getElementById('rp-typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 text-orange-600">Aiya! 安娣没听清楚，你可以再说一次吗？</div></div>`; }
             chatBox.scrollTop = chatBox.scrollHeight;
         };
         document.getElementById('rp-user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleRPSend(); });
@@ -522,12 +569,10 @@
             chatBox.innerHTML += `<div class="flex items-end gap-2 user-msg flex-row-reverse mb-2"><div class="bubble font-bold shadow-md">${text}</div></div>`; input.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
             chatBox.innerHTML += `<div id="typing" class="flex items-end gap-2 ai-msg mb-2"><div class="bubble flex items-center h-10 gap-1 px-3 shadow-sm"><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div></div></div>`; chatBox.scrollTop = chatBox.scrollHeight;
             try { 
-                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用中文简短回答学生：${text}`}) }); 
-                const data = await res.json(); document.getElementById('typing').remove(); 
+                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用中文简短回答学生：${text}`}) }); const data = await res.json(); document.getElementById('typing').remove(); 
                 const safeReadText = data.text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
                 chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-lg shrink-0 border border-white shadow-sm pb-1">🤖</div><div class="bubble font-bold shadow-sm relative pr-8">${data.text.replace(/\n/g, '<br>')}<button onclick="window.speakText('${safeReadText}')" class="absolute top-2 right-2 text-lg opacity-60 hover:opacity-100">🔊</button></div></div>`; playSound('jump'); 
-            } 
-            catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-lg shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold text-indigo-700 shadow-sm">建议查阅课本，或去问问老师哦！</div></div>`; }
+            } catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-lg shrink-0 border border-white shadow-sm">🤖</div><div class="bubble font-bold text-indigo-700 shadow-sm">建议查阅课本，或去问问老师哦！</div></div>`; }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
         window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); switchView('ai'); }; document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
@@ -542,27 +587,15 @@
 
         window.generateAIQuiz = () => { 
             Swal.fire({ 
-                title: '✨ AI 智能一键出题', 
-                input: 'text', 
-                inputLabel: '请输入您想测试的课文主题或知识点', 
-                inputPlaceholder: '例如：中秋节、多音多义字、环保...', 
-                showCancelButton: true, confirmButtonText: '生成题目', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', 
-                preConfirm: (topic) => { if (!topic) Swal.showValidationMessage('请输入主题！'); return topic; } 
+                title: '✨ AI 智能一键出题', input: 'text', inputLabel: '请输入您想测试的课文主题或知识点', inputPlaceholder: '例如：中秋节、多音多义字、环保...', showCancelButton: true, confirmButtonText: '生成题目', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', preConfirm: (topic) => { if (!topic) Swal.showValidationMessage('请输入主题！'); return topic; } 
             }).then(async (result) => { 
                 if (result.isConfirmed) { 
-                    const topic = result.value;
-                    Swal.fire({ title: 'AI 正在思考...', html: `正在为您生成关于《${topic}》的专属题目`, allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
-                    
+                    const topic = result.value; Swal.fire({ title: 'AI 正在思考...', html: `正在为您生成关于《${topic}》的专属题目`, allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
                     try {
                         const prompt = `帮我生成2道关于"${topic}"的小学华文单选题。直接输出题目和A,B,C选项内容即可，不要任何多余的开头或结尾。`;
                         const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: prompt}) }); 
-                        const data = await res.json();
-                        const aiQuestions = data.text.replace(/\n/g, '<br>');
-                        showQuizPreview(topic, aiQuestions);
-                    } catch(e) {
-                        const mockQ = `1. 关于“${topic}”，以下哪项是正确的？<br>A) 非常重要<br>B) 完全无关<br>C) 不清楚<br><br>2. 我们应该如何对待“${topic}”？<br>A) 积极学习<br>B) 视而不见<br>C) 随意破坏`;
-                        showQuizPreview(topic, mockQ);
-                    }
+                        const data = await res.json(); const aiQuestions = data.text.replace(/\n/g, '<br>'); showQuizPreview(topic, aiQuestions);
+                    } catch(e) { const mockQ = `1. 关于“${topic}”，以下哪项是正确的？<br>A) 非常重要<br>B) 完全无关<br>C) 不清楚<br><br>2. 我们应该如何对待“${topic}”？<br>A) 积极学习<br>B) 视而不见<br>C) 随意破坏`; showQuizPreview(topic, mockQ); }
                 } 
             }); 
         };
@@ -570,62 +603,21 @@
         function showQuizPreview(topic, questionsHTML) {
             Swal.fire({
                 title: '📝 题目预览与编辑',
-                html: `
-                    <div class="text-left text-sm space-y-3 mt-4 max-h-60 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <div class="font-bold text-slate-700 mb-2">生成主题: ${topic}</div>
-                        <div class="text-slate-800 leading-relaxed text-base" contenteditable="true" style="outline: none; padding: 12px; background: white; border-radius: 8px; border: 1.5px dashed #94a3b8; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                            ${questionsHTML}
-                        </div>
-                        <div class="text-xs text-indigo-500 text-center mt-3 font-bold">* 老师，您可以直接在上方白框内点击并修改文字内容。</div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '✅ 确认无误，下发给全班',
-                cancelButtonText: '重新生成',
-                confirmButtonColor: '#10b981',
-                width: '600px'
-            }).then((reviewRes) => {
-                if (reviewRes.isConfirmed) {
-                    Swal.fire('发布成功！', '题目已实时推送到全班学生的手机终端，学生完成将获得奖励！', 'success'); 
-                } else if (reviewRes.dismiss === Swal.DismissReason.cancel) {
-                    window.generateAIQuiz(); 
-                }
-            });
+                html: `<div class="text-left text-sm space-y-3 mt-4 max-h-60 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200"><div class="font-bold text-slate-700 mb-2">生成主题: ${topic}</div><div class="text-slate-800 leading-relaxed text-base" contenteditable="true" style="outline: none; padding: 12px; background: white; border-radius: 8px; border: 1.5px dashed #94a3b8; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">${questionsHTML}</div><div class="text-xs text-indigo-500 text-center mt-3 font-bold">* 老师，您可以直接在上方白框内点击并修改文字内容。</div></div>`,
+                showCancelButton: true, confirmButtonText: '✅ 确认无误，下发给全班', cancelButtonText: '重新生成', confirmButtonColor: '#10b981', width: '600px'
+            }).then((reviewRes) => { if (reviewRes.isConfirmed) { Swal.fire('发布成功！', '题目已实时推送到全班学生的手机终端，学生完成将获得奖励！', 'success'); } else if (reviewRes.dismiss === Swal.DismissReason.cancel) { window.generateAIQuiz(); } });
         }
 
         window.mockUploadMaterial = () => {
             Swal.fire({
                 title: '上传教学材料',
-                html: `
-                    <input type="file" id="real-file-input" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*">
-                    <div class="border-2 border-dashed border-indigo-300 rounded-2xl p-8 bg-indigo-50 text-indigo-500 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100 transition-colors" onclick="document.getElementById('real-file-input').click()">
-                        <div class="text-5xl mb-3">📁</div>
-                        <div class="font-bold text-lg" id="upload-text">点击此处选择文件</div>
-                        <span class="text-xs text-indigo-400 mt-2 block">支持 PDF, Word, PPT 或 图片格式</span>
-                    </div>
-                `,
+                html: `<input type="file" id="real-file-input" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*"><div class="border-2 border-dashed border-indigo-300 rounded-2xl p-8 bg-indigo-50 text-indigo-500 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100 transition-colors" onclick="document.getElementById('real-file-input').click()"><div class="text-5xl mb-3">📁</div><div class="font-bold text-lg" id="upload-text">点击此处选择文件</div><span class="text-xs text-indigo-400 mt-2 block">支持 PDF, Word, PPT 或 图片格式</span></div>`,
                 showConfirmButton: false, showCancelButton: true, cancelButtonText: '取消',
                 didOpen: () => {
                     document.getElementById('real-file-input').addEventListener('change', function(e) {
                         if(e.target.files.length > 0) {
-                            const fileName = e.target.files[0].name;
-                            document.getElementById('upload-text').innerText = "已选中: " + fileName;
-                            
-                            setTimeout(() => {
-                                Swal.fire({ title: 'AI 深度分析中...', html: `正在阅读 <b>${fileName}</b> 并提取核心考点`, timer: 2500, timerProgressBar: true, didOpen: () => Swal.showLoading() }).then(() => {
-                                    Swal.fire({
-                                        title: '✨ 分析完成！',
-                                        html: `
-                                            <p class="text-sm text-left mb-4 text-slate-600">PandAI 助手已从您的材料中成功提取了 <b class="text-indigo-600">12</b> 个核心生词和 <b class="text-purple-600">3</b> 个关键语法句型。</p>
-                                            <div class="flex flex-col gap-3">
-                                                <button onclick="Swal.clickConfirm(); setTimeout(generateAIQuiz, 300)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">👉 立刻根据材料生成随堂测验</button>
-                                                <button onclick="Swal.fire('课件已优化', 'AI 已为您补充了相关的趣味图片与精准拼音标注！', 'success')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">🌟 生成优化版课件 (附拼音解释)</button>
-                                            </div>
-                                        `,
-                                        showConfirmButton: false, showCancelButton: true, cancelButtonText: '关闭窗口'
-                                    });
-                                });
-                            }, 500);
+                            const fileName = e.target.files[0].name; document.getElementById('upload-text').innerText = "已选中: " + fileName;
+                            setTimeout(() => { Swal.fire({ title: 'AI 深度分析中...', html: `正在阅读 <b>${fileName}</b> 并提取核心考点`, timer: 2500, timerProgressBar: true, didOpen: () => Swal.showLoading() }).then(() => { Swal.fire({ title: '✨ 分析完成！', html: `<p class="text-sm text-left mb-4 text-slate-600">PandAI 助手已从您的材料中成功提取了 <b class="text-indigo-600">12</b> 个核心生词和 <b class="text-purple-600">3</b> 个关键语法句型。</p><div class="flex flex-col gap-3"><button onclick="Swal.clickConfirm(); setTimeout(generateAIQuiz, 300)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">👉 立刻根据材料生成随堂测验</button><button onclick="Swal.fire('课件已优化', 'AI 已为您补充了相关的趣味图片与精准拼音标注！', 'success')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">🌟 生成优化版课件 (附拼音解释)</button></div>`, showConfirmButton: false, showCancelButton: true, cancelButtonText: '关闭窗口' }); }); }, 500);
                         }
                     });
                 }
@@ -648,24 +640,20 @@
         const firebaseConfig = { apiKey: "AIzaSyCq1wRqEta9Ow-q67TOqbz2GnPq-caPuLQ", authDomain: "pandai-bahasa-cina.firebaseapp.com", projectId: "pandai-bahasa-cina", storageBucket: "pandai-bahasa-cina.firebasestorage.app", messagingSenderId: "160554837509", appId: "1:160554837509:web:957d43650afc874e775e6c", measurementId: "G-SPMXMPKVQ2" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         
-        let isRegisterMode = false; window.selectedRole = 'student'; 
-        window.activeTimer = null; let hidePortalTimeout = null;
+        let isRegisterMode = false; window.selectedRole = 'student'; window.activeTimer = null; let hidePortalTimeout = null;
         
         window.updateFirebaseXP = async (newXP) => { if(auth.currentUser) { await setDoc(doc(db, "users", auth.currentUser.uid), { xp: newXP }, { merge: true }); } };
+        // 🌟 新增：保存头像配置到 Firebase
+        window.saveAvatarToFirebase = async (config) => { if(auth.currentUser) { await setDoc(doc(db, "users", auth.currentUser.uid), { avatarConfig: config }, { merge: true }); } };
 
         window.fetchLeaderboard = async () => {
             const container = document.getElementById('leaderboard-container'); const teacherTable = document.getElementById('teacher-table-body');
             if(container) container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">正在拉取云端数据...</div>';
             try {
                 if (window.selectedRole === 'teacher') {
-                    const allUsersSnap = await getDocs(collection(db, "users"));
-                    let total = 0, students = 0, teachers = 0;
+                    const allUsersSnap = await getDocs(collection(db, "users")); let total = 0, students = 0, teachers = 0;
                     allUsersSnap.forEach(doc => { total++; if(doc.data().role === 'student') students++; else if(doc.data().role === 'teacher') teachers++; });
-                    if(document.getElementById('stat-total')) {
-                        document.getElementById('stat-total').innerText = total;
-                        document.getElementById('stat-students').innerText = students;
-                        document.getElementById('stat-teachers').innerText = teachers;
-                    }
+                    if(document.getElementById('stat-total')) { document.getElementById('stat-total').innerText = total; document.getElementById('stat-students').innerText = students; document.getElementById('stat-teachers').innerText = teachers; }
                 }
 
                 const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20)); const querySnapshot = await getDocs(q); 
@@ -676,17 +664,37 @@
                     const userXp = data.xp || 0; const sec = data.activeSeconds || 0; const mins = Math.floor(sec / 60); const remainSec = sec % 60; const timeStr = mins > 0 ? `${mins}分 ${remainSec}秒` : `${sec}秒`;
                     const userStreak = data.streak || 1;
                     
+                    // 获取玩家的专属头像，如果没有则使用默认
+                    const avatarUrl = data.avatarConfig 
+                        ? `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${data.avatarConfig.skinColor}&top=${data.avatarConfig.top}&clothing=${data.avatarConfig.clothing}` 
+                        : `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}&backgroundColor=e0e7ff`;
+
                     let statusHtml = '';
                     if (sec > 300) statusHtml = '<span class="text-green-700 bg-green-100 px-2 py-1 rounded border border-green-300">🌟 勤奋好学</span>';
                     else if (sec > 60) statusHtml = '<span class="text-blue-700 bg-blue-100 px-2 py-1 rounded border border-blue-300">✅ 正常活跃</span>';
                     else if (sec > 0) statusHtml = '<span class="text-amber-700 bg-amber-100 px-2 py-1 rounded border border-amber-300">⚠️ 刚起步</span>';
                     else statusHtml = '<span class="text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-300">💤 潜水摸鱼</span>';
 
-                    let medal = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-inner">${rank}</span>`;
-                    if(rank === 1) medal = `<span class="text-3xl drop-shadow-md">🥇</span>`; if(rank === 2) medal = `<span class="text-3xl drop-shadow-md">🥈</span>`; if(rank === 3) medal = `<span class="text-3xl drop-shadow-md">🥉</span>`;
+                    let medal = `<span class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-md text-xs border border-white z-20">${rank}</span>`;
+                    if(rank === 1) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥇</span>`; if(rank === 2) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥈</span>`; if(rank === 3) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥉</span>`;
                     
-                    html += `<div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors"><div class="flex items-center gap-4"><div class="w-10 flex justify-center">${medal}</div><div class="font-bold text-slate-700">${data.name || '神秘学者'} <span class="text-xs text-orange-500 ml-1">🔥${userStreak}</span> <span class="text-xs text-slate-400 font-normal ml-2">在线: ${timeStr}</span></div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div></div>`;
-                    teacherHtml += `<tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700">${data.name || '未命名'}</td><td class="p-3 text-indigo-600 font-bold">${userXp} XP</td><td class="p-3 text-emerald-600 font-bold">${timeStr}</td><td class="p-3 text-center font-bold text-orange-500">🔥 ${userStreak} 天</td></tr>`;
+                    // 🌟 更新排行榜 UI：现在展示学生的数字分身！
+                    html += `
+                        <div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-12 h-12 rounded-full bg-indigo-50 border-2 border-white shadow-sm">
+                                    ${medal}
+                                    <img src="${avatarUrl}" class="w-full h-full object-cover rounded-full">
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-700 flex items-center gap-1">${data.name || '神秘学者'} <span class="text-[10px] text-orange-500 bg-orange-50 px-1 rounded border border-orange-100">🔥${userStreak}</span></div>
+                                    <div class="text-xs text-slate-400">在线时长: ${timeStr}</div>
+                                </div>
+                            </div>
+                            <div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div>
+                        </div>`;
+                        
+                    teacherHtml += `<tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700 flex items-center gap-2"><img src="${avatarUrl}" class="w-8 h-8 rounded-full bg-indigo-50 border border-white shadow-sm"> ${data.name || '未命名'}</td><td class="p-3 text-indigo-600 font-bold">${userXp} XP</td><td class="p-3 text-emerald-600 font-bold">${timeStr}</td><td class="p-3 text-center font-bold text-orange-500">🔥 ${userStreak} 天</td></tr>`;
                     rank++;
                 });
                 if(html === '') { html = `<div class="p-8 text-center text-slate-500 font-bold">暂无学生数据</div>`; teacherHtml = `<tr><td colspan="4" class="p-4 text-center text-slate-400">暂无学生数据</td></tr>`; }
@@ -754,6 +762,10 @@
                 if (docSnap.exists()) { 
                     const data = docSnap.data();
                     if(data.role) role = data.role; if(data.name) name = data.name; if(data.xp) userXp = data.xp; 
+                    
+                    // 🌟 加载用户的头像数据
+                    if(data.avatarConfig) { window.avatarConfig = data.avatarConfig; }
+                    else { window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' }; }
                     
                     const todayDateStr = new Date().toDateString();
                     streak = data.streak || 1; const lastLogin = data.lastLoginDate || "";
