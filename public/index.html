@@ -22,9 +22,15 @@
         .nav-btn.active .icon-box { background: linear-gradient(135deg, #6366f1, #4f46e5); border: 1px solid #818cf8; }
         .bounce-slow { animation: bounceSlow 3s infinite alternate ease-in-out; }
         @keyframes bounceSlow { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+        .pet-card { transition: all 0.3s; } .pet-card:hover { transform: scale(1.05); }
+        .pet-glow { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6); border-color: #fbbf24; }
+        .pet-locked { filter: brightness(0.2) grayscale(100%); opacity: 0.6; }
         .quiz-btn { background: white; border: 2px solid #e2e8f0; font-size: 1.1rem; font-weight: bold; padding: 1rem; border-radius: 12px; transition: all 0.1s; cursor: pointer; }
         .quiz-btn.correct { background: #22c55e; border-color: #16a34a; color: white;}
         .quiz-btn.wrong { background: #ef4444; border-color: #dc2626; color: white;}
+        .bubble { max-width: 90%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.5; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .ai-msg .bubble { background: white; border: 2px solid #e2e8f0; border-bottom-left-radius: 0.25rem; color: #334155; }
+        .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
         
         /* 登录界面的毛玻璃特效 */
         #login-portal { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.7); transition: opacity 0.5s ease; }
@@ -42,34 +48,34 @@
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-800">PandAI Bahasa Cina</h1>
                 <p class="text-indigo-600 font-bold mt-1" id="auth-subtitle">请登录进入系统</p>
             </div>
-
-            <!-- 身份选择 (学生/教师) -->
+            
+            <!-- 身份选择按钮 -->
             <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
                 <button id="role-student" onclick="window.setRole('student')" class="role-btn selected flex-1 py-2 rounded-lg text-slate-600">👦 学生</button>
                 <button id="role-teacher" onclick="window.setRole('teacher')" class="role-btn flex-1 py-2 rounded-lg text-slate-600">👩‍🏫 教师</button>
             </div>
-
+            
+            <!-- 登录/注册表单 -->
             <form id="auth-form" onsubmit="window.handleAuth(event)" class="flex flex-col gap-3">
                 <input type="text" id="auth-name" placeholder="您的全名 (仅注册需填写)" class="hidden bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
                 <input type="email" id="auth-email" placeholder="DELIMa / MOE 电子邮件" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
                 <input type="password" id="auth-password" placeholder="密码 (至少6位)" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
-                
                 <button type="submit" id="auth-action-btn" class="bg-indigo-600 text-white font-bold rounded-xl py-3 mt-2 shadow-lg shadow-indigo-200 active:scale-95 transition-all">登 录</button>
             </form>
-
+            
             <div class="flex items-center justify-between text-sm font-bold mt-2">
                 <button onclick="window.toggleAuthMode()" id="auth-toggle-btn" class="text-indigo-600 hover:underline">没有账号？点击注册</button>
                 <button onclick="window.resetPassword()" class="text-slate-500 hover:underline">忘记密码？</button>
             </div>
-
+            
             <div class="flex items-center gap-4 my-2">
                 <div class="h-px bg-slate-200 flex-1"></div>
                 <span class="text-xs font-bold text-slate-400">或</span>
                 <div class="h-px bg-slate-200 flex-1"></div>
             </div>
-
+            
             <button onclick="window.loginWithGoogle()" class="bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl py-3 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-50">
-                <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> 
                 使用 Google 账号继续
             </button>
         </div>
@@ -81,15 +87,14 @@
             <div class="flex items-center gap-2 md:gap-3">
                 <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg md:rounded-xl flex items-center justify-center text-2xl shadow-lg pb-1">🚀</div>
                 <div class="flex flex-col">
-                    <span class="text-lg md:text-xl font-bold text-slate-800 tracking-wider">PandAI <span class="text-indigo-600 text-xs md:text-sm bg-indigo-50 px-2 py-0.5 rounded-full" id="user-display-name">用户</span></span>
+                    <span class="text-lg md:text-xl font-bold text-slate-800 tracking-wider">PandAI <span class="text-indigo-600 text-xs md:text-sm bg-indigo-50 px-2 py-0.5 rounded-full shadow-sm" id="user-display-name">用户</span></span>
+                    <span id="ui-subtitle" class="text-xs font-bold text-slate-500">KSSR Semakan</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="window.logout()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg font-bold border border-red-200">退出</button>
-                <select id="lang-select" onchange="changeLang(this.value)" class="bg-white border-2 border-slate-200 rounded-lg px-1 py-1 text-sm font-bold outline-none cursor-pointer">
-                    <option value="zh">中</option><option value="ms">BM</option><option value="en">EN</option>
-                </select>
-                <button onclick="toggleAudio()" class="w-8 h-8 rounded-lg bg-slate-100 border-2 border-slate-200 text-lg flex items-center justify-center pb-1"><span id="sound-icon">🔇</span></button>
+                <button onclick="window.logout()" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 md:py-2 rounded-lg font-bold border border-red-200 transition-colors">退出</button>
+                <select id="lang-select" onchange="changeLang(this.value)" class="bg-white border-2 border-slate-200 rounded-lg px-1 py-1 md:py-1.5 text-sm font-bold outline-none cursor-pointer"><option value="zh">中</option><option value="ms">BM</option><option value="en">EN</option></select>
+                <button onclick="toggleAudio()" class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-slate-100 border-2 border-slate-200 text-lg flex items-center justify-center pb-1"><span id="sound-icon">🔇</span></button>
             </div>
         </div>
     </header>
@@ -97,62 +102,245 @@
     <!-- 主界面内容区 -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full px-2 md:px-4 pb-[80px] md:pb-4 gap-4 min-h-0 relative hidden" id="main-content">
         
-        <!-- 侧边栏/底部导航 -->
+        <!-- 响应式底部/侧边导航 -->
         <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 flex justify-around p-2 md:relative md:bg-transparent md:border-none md:w-72 md:flex-col md:p-4 md:gap-3 glass-panel md:rounded-2xl" id="sidebar-nav"></nav>
 
         <main class="flex-1 scrollable-area flex flex-col glass-panel rounded-2xl shadow-xl z-10 relative">
             
-            <!-- 学生页面：萌宠大厅 -->
-            <div id="view-dashboard" class="flex-1 p-4 flex flex-col items-center justify-center min-h-[400px]">
-                <div class="bg-gradient-to-b from-indigo-50 to-white w-full max-w-2xl rounded-3xl p-6 text-center border border-indigo-100 shadow-sm relative">
-                    <h3 class="text-2xl font-bold text-slate-800 mb-4">我的学习萌宠</h3>
-                    <div class="text-7xl my-4 bounce-slow cursor-pointer" onclick="playSound('jump')" id="pet-emoji">🥚</div>
+            <!-- 学生主页区 -->
+            <div id="view-dashboard" class="hidden flex-1 p-4 md:p-6 flex flex-col items-center justify-center min-h-[400px]">
+                <div class="bg-gradient-to-b from-indigo-50 to-white w-full max-w-2xl rounded-3xl p-6 md:p-8 border-2 border-indigo-100 shadow-sm relative overflow-hidden text-center">
+                    <span class="absolute top-4 right-4 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold" id="pet-level-badge">Lv. 1</span>
+                    <h3 id="ui-pet-title" class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">我的学习萌宠</h3>
+                    <div class="flex flex-col items-center gap-2 mb-4">
+                        <span class="text-sm font-bold text-slate-500" id="ui-xp-label">XP: <span id="xp-text" class="text-indigo-600">0/50</span></span>
+                        <div class="w-40 md:w-48 h-3 bg-slate-200 rounded-full overflow-hidden border border-slate-300">
+                            <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-700" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="text-7xl md:text-9xl my-4 bounce-slow cursor-pointer drop-shadow-xl" id="pet-emoji" onclick="playSound('jump')">🥚</div>
                     <h4 id="pet-name" class="text-2xl font-bold text-indigo-600 mt-2">灵力蛋</h4>
-                    <button onclick="switchView('quiz')" class="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">▶️ 开始今日任务</button>
+                    <p id="ui-pet-desc" class="text-slate-600 font-bold text-sm md:text-base mt-2">完成答题任务，获取星星经验值让宠物进化吧！</p>
+                    <button onclick="switchView('quiz')" class="mt-6 bg-indigo-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">▶️ <span id="ui-btn-start">开始今日任务</span></button>
                 </div>
             </div>
 
-            <!-- 学生页面：答题区 -->
-            <div id="view-quiz" class="hidden flex-1 p-4 bg-slate-50 relative min-h-[400px]">
+            <!-- 学生游戏答题区 -->
+            <div id="view-quiz" class="hidden flex-1 p-4 md:p-6 bg-slate-50 relative min-h-[400px]">
+                <div class="absolute top-4 right-4 bg-white border-2 border-amber-400 px-3 py-1 rounded-xl text-amber-500 font-bold text-lg shadow-sm z-20">⭐ <span id="game-score">0</span></div>
                 <div class="w-full max-w-3xl mx-auto pt-10 pb-6 flex flex-col items-center">
-                    <div class="bg-white p-6 rounded-3xl mb-6 text-center relative w-full border-2 border-slate-200">
-                        <h3 id="game-question" class="text-xl font-bold text-slate-800 mt-4 leading-relaxed">加载中...</h3>
+                    <div class="bg-white p-6 rounded-3xl mb-6 text-center relative w-full border-4 border-slate-200 shadow-md">
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white font-bold text-sm md:text-lg px-4 py-1 rounded-full"><span id="ui-q-prefix">第</span> <span id="q-num">1/5</span> <span id="ui-q-suffix">题</span></div>
+                        <h3 id="game-question" class="text-xl md:text-2xl font-bold text-slate-800 mt-4 leading-relaxed">加载中...</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full" id="game-options"></div>
                 </div>
             </div>
 
-            <!-- 通用页面：AI 助手 -->
+            <!-- AI 聊天区 -->
             <div id="view-ai" class="hidden flex-1 flex flex-col bg-slate-50">
-                <div class="flex-1 scrollable-area p-3 flex flex-col gap-4" id="chat-messages">
+                <div class="bg-white border-b border-slate-200 py-2 px-3 text-center shadow-sm z-10 shrink-0">
+                    <span class="text-lg font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 <span id="ui-ai-title">万能 Gemini 学习助手</span></span>
+                </div>
+                <div class="flex-1 scrollable-area p-3 md:p-4 flex flex-col gap-4" id="chat-messages">
                     <div class="flex items-end gap-2 ai-msg">
-                        <div class="bubble font-bold bg-white border p-3 rounded-xl rounded-bl-sm">你好！我是真正的云端大模型，有问必答！💡</div>
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-lg shrink-0 border border-indigo-200 pb-1">🤖</div>
+                        <div class="bubble font-bold" id="ui-ai-intro">你好！我是真正的云端大模型，有问必答！💡</div>
                     </div>
                 </div>
-                <div class="p-3 bg-white border-t border-slate-100 shrink-0 flex">
-                    <input type="text" id="user-input" class="flex-1 bg-slate-50 border border-slate-200 rounded-l-xl px-3 outline-none font-bold" placeholder="输入你想问的问题...">
-                    <button onclick="handleSend()" class="bg-indigo-600 text-white rounded-r-xl px-4 py-2 font-bold active:bg-indigo-700">发送</button>
+                <div class="bg-white px-3 pt-2 pb-2 border-t-2 border-slate-200 shrink-0 overflow-x-auto whitespace-nowrap scrollbar-hide"><div class="flex gap-2" id="quick-prompts"></div></div>
+                <div class="p-3 bg-white border-t border-slate-100 shrink-0">
+                    <div class="flex bg-slate-50 rounded-xl border-2 border-slate-200 focus-within:border-indigo-500 transition-all p-1">
+                        <input type="text" id="user-input" class="flex-1 bg-transparent border-none outline-none text-slate-800 px-3 py-1 font-bold text-base" placeholder="输入问题..." autocomplete="off">
+                        <button onclick="handleSend()" id="ui-btn-send" class="bg-indigo-600 text-white rounded-lg px-4 py-1.5 font-bold active:translate-y-1">发送</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 教师页面：数据中心 -->
+            <!-- 教师数据中心区 -->
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-slate-50 scrollable-area">
-                <h2 class="text-xl font-bold text-slate-800 mb-4">📊 教师数据中心</h2>
-                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden p-4 text-center">
-                    <p class="text-slate-500 font-bold mb-4">欢迎来到教师端，这里将显示全班的学习进度。</p>
-                    <button onclick="switchView('ai')" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-bold">👉 去体验 AI 助手生成教案</button>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4">📊 <span id="ui-t-title">教师数据中心</span></h2>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left min-w-[500px]">
+                        <thead class="bg-slate-100 text-slate-600 text-sm md:text-base">
+                            <tr><th class="p-3 font-bold" id="ui-th-1">学生姓名</th><th class="p-3 font-bold" id="ui-th-3">词汇</th><th class="p-3 font-bold" id="ui-th-4">语法</th><th class="p-3 font-bold text-center" id="ui-th-5">操作</th></tr>
+                        </thead>
+                        <tbody class="text-sm md:text-base" id="teacher-table-body"></tbody>
+                    </table>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- 引入 Firebase 云端 SDK (模块化语法) -->
+    <!-- UI, 游戏, AI逻辑脚本 -->
+    <script>
+        const langData = {
+            zh: { nav: ['主页', '答题', 'AI助手', '图鉴', '教师'], sub: "KSSR 互动平台", xpLabel: "XP:", petTitle: "我的萌宠", petDesc: "答题赚星星，让宠物进化！", btnStart: "开始任务", qPrefix: "第", qSuffix: "题", qDone: "恭喜完成！🎉<br>获得 {xp} XP！", btnHome: "返回", aiTitle: "真实 AI 助手", aiIntro: "你好！我连接了真实的云端大脑，有问必答！💡", aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'], btnSend: "发送", tTitle: "数据中心", th: ['学生', '词汇', '语法', '生成 AI 分析'], tBtnAna: "✨ 分析", petNames: ['灵力蛋', '青青虫', '幻彩蝶', '翱翔鹰', '传说神龙'],
+                quiz: [
+                    { q: "选择正确拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
+                    { q: "“今天天气很___，去放风筝吧！” 填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 },
+                    { q: "表示“School”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
+                ], swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？", askAI: "问问 AI", nextQ: "下一题", evoT: "进化啦！", evoD: "变成" }
+            },
+            ms: { nav: ['Utama', 'Kuiz', 'Tutor AI', 'Koleksi', 'Guru'], sub: "Platform KSSR", xpLabel: "XP:", petTitle: "Haiwan Saya", petDesc: "Siapkan tugasan kumpul bintang!", btnStart: "Mula", qPrefix: "S.", qSuffix: "", qDone: "Tahniah!🎉<br>Dapat {xp} XP!", btnHome: "Kembali", aiTitle: "Tutor AI", aiIntro: "Hai! Tanya apa sahaja! 💡", aiPrompts: ['❓ Kenapa matahari bersinar', '✏️ Bina ayat', '📖 Apa itu Polyphony'], btnSend: "Hantar", tTitle: "Data Guru", th: ['Pelajar', 'Kosa Kata', 'Tatabahasa', 'Analisis AI'], tBtnAna: "✨ Analisis", petNames: ['Telur', 'Ulat', 'Rama-rama', 'Helang', 'Naga'],
+                quiz: [{ q: "Pinyin yang betul: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Isi tempat kosong: 今天天气很___", opts: ["下雨 (Hujan)", "晴朗 (Cerah)", "伤心 (Sedih)", "黑暗 (Gelap)"], ans: 1 }, { q: "Maksud School?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Salah!", wrongD: "Tanya Cikgu AI?", askAI: "Tanya AI", nextQ: "Seterusnya", evoT: "Evolusi!", evoD: "Menjadi" }
+            },
+            en: { nav: ['Home', 'Quests', 'Live AI', 'Pokedex', 'Teacher'], sub: "KSSR Platform", xpLabel: "XP:", petTitle: "My Pet", petDesc: "Do quests to earn stars!", btnStart: "Start", qPrefix: "Q", qSuffix: "", qDone: "Congrats!🎉<br>Earned {xp} XP!", btnHome: "Home", aiTitle: "Live AI Tutor", aiIntro: "Hi! Ask me anything! 💡", aiPrompts: ['❓ Why sun shines', '✏️ Write a sentence', '📖 Explain Polyphony'], btnSend: "Send", tTitle: "Teacher Data", th: ['Student', 'Vocab', 'Grammar', 'AI Analysis'], tBtnAna: "✨ Analysis", petNames: ['Egg', 'Caterpillar', 'Butterfly', 'Eagle', 'Dragon'],
+                quiz: [{ q: "Correct pinyin: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Fill in: 今天天气很___", opts: ["下雨 (Rain)", "晴朗 (Sunny)", "伤心 (Sad)", "黑暗 (Dark)"], ans: 1 }, { q: "Word for School?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Incorrect!", wrongD: "Need AI Tutor?", askAI: "Ask AI", nextQ: "Next", evoT: "Evolution!", evoD: "Evolved to" }
+            }
+        };
+
+        const studentData = [{ name: "林小明", vocab: "TP 6", grammar: "TP 2", vCol: "text-purple-600", gCol: "text-red-500" }, { name: "阿布", vocab: "TP 3", grammar: "TP 3", vCol: "text-amber-500", gCol: "text-amber-500" }];
+        const navIcons = [{ id: 'dashboard', emoji: '🏠' }, { id: 'quiz', emoji: '🎮' }, { id: 'ai', emoji: '🤖' }, { id: 'pokedex', emoji: '📖' }, { id: 'teacher', emoji: '📊' }];
+        
+        let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
+        let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student';
+
+        async function initAudio() {
+            if (isAudioInit) return; await Tone.start(); Tone.Destination.mute = false;
+            synths.click = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1 } }).toDestination();
+            synths.coin = new Tone.Synth({ oscillator: { type: "triangle" } }).toDestination();
+            synths.wrong = new Tone.MembraneSynth().toDestination(); synths.win = new Tone.PolySynth(Tone.Synth).toDestination();
+            synths.click.volume.value = -10; synths.coin.volume.value = -10; synths.wrong.volume.value = -5; synths.win.volume.value = -8;
+            isAudioInit = true; document.getElementById('sound-icon').innerText = "🔊";
+        }
+        function toggleAudio() { if (!isAudioInit) { initAudio(); return; } Tone.Destination.mute = !Tone.Destination.mute; document.getElementById('sound-icon').innerText = Tone.Destination.mute ? "🔇" : "🔊"; }
+        function playSound(type) {
+            if (!isAudioInit || Tone.Destination.mute) return; const now = Tone.now();
+            if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
+            if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
+            if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
+            if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
+        }
+
+        window.changeLang = (lang) => {
+            currLang = lang; const t = langData[currLang];
+            document.getElementById('ui-subtitle').innerText = t.sub;
+            document.getElementById('ui-xp-label').innerHTML = `${t.xpLabel} <span id="xp-text" class="text-indigo-600">${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}</span>`;
+            document.getElementById('ui-pet-title').innerText = t.petTitle; document.getElementById('ui-pet-desc').innerText = t.petDesc;
+            document.getElementById('ui-btn-start').innerText = t.btnStart; document.getElementById('pet-name').innerText = t.petNames[level-1];
+            document.getElementById('ui-ai-title').innerText = t.aiTitle; document.getElementById('ui-ai-intro').innerText = t.aiIntro; document.getElementById('ui-btn-send').innerText = t.btnSend;
+            
+            const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
+            t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold">${p}</button>`; });
+
+            document.getElementById('ui-t-title').innerText = t.tTitle;
+            t.th.forEach((thText, i) => { if(document.getElementById(`ui-th-${i+1}`)) document.getElementById(`ui-th-${i+1}`).innerText = thText; });
+            
+            renderNav(); renderTeacherTable();
+            if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
+        }
+
+        function renderNav() {
+            const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
+            const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 2]; 
+            
+            allowedIndices.forEach(i => {
+                const navItem = navIcons[i]; const title = langData[currLang].nav[i];
+                const btn = document.createElement('button');
+                btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-slate-200 md:mb-2`;
+                if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
+                btn.onclick = () => { playSound('click'); if (navItem.id === 'pokedex') { showPokedex(); return; } switchView(navItem.id); };
+                btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
+                nav.appendChild(btn);
+            });
+        }
+
+        window.configureLayout = (role) => { currentRole = role; changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); };
+
+        function renderTeacherTable() {
+            const tbody = document.getElementById('teacher-table-body'); tbody.innerHTML = '';
+            studentData.forEach((s, idx) => {
+                tbody.innerHTML += `<tr class="border-t border-slate-200 hover:bg-white"><td class="p-2 md:p-3 font-bold">${s.name}</td><td class="p-2 md:p-3 ${s.vCol} font-bold">${s.vocab}</td><td class="p-2 md:p-3 ${s.gCol} font-bold">${s.grammar}</td><td class="p-2 md:p-3 text-center"><button onclick="generateAI(${idx})" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1 rounded font-bold text-xs">${langData[currLang].tBtnAna}</button></td></tr>`;
+            });
+        }
+
+        window.switchView = (viewId) => {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            ['view-dashboard', 'view-quiz', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            renderNav(); 
+            if(viewId === 'quiz') startQuiz();
+        };
+
+        function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
+        
+        function loadQuestion() {
+            const t = langData[currLang]; const qData = t.quiz;
+            if (currentQ >= qData.length) {
+                document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold">${t.qDone.replace('{xp}', gameScore*10)}</span>`;
+                document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2">${t.btnHome}</button>`;
+                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐";
+                playSound('levelup'); return;
+            }
+            document.getElementById('ui-q-prefix').innerText = t.qPrefix; document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`; document.getElementById('ui-q-suffix').innerText = t.qSuffix;
+            document.getElementById('game-question').innerText = qData[currentQ].q;
+            document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
+        }
+
+        window.checkAnswer = (selectedIdx, btn) => {
+            const t = langData[currLang]; const isCorrect = selectedIdx === t.quiz[currentQ].ans;
+            document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(10);
+            } else {
+                btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct');
+                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: t.swal.askAI, cancelButtonText: t.swal.nextQ, confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return;
+            }
+            setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
+        }
+
+        function gainXP(amount) {
+            xp += amount; let nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
+            if(level < 5 && xp >= nextLimit) {
+                level++; playSound('levelup');
+                Swal.fire({ html: `<div class="text-7xl my-4 bounce-slow">${petStages[level-1]}</div><h2 class="text-2xl font-bold text-amber-500">${langData[currLang].swal.evoT}</h2><p class="font-bold">${langData[currLang].swal.evoD} <b class="text-indigo-600">${langData[currLang].petNames[level-1]}</b>！</p>`, confirmButtonColor: '#4f46e5' });
+                nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
+            }
+            document.getElementById('pet-emoji').innerText = petStages[level - 1]; document.getElementById('pet-name').innerText = langData[currLang].petNames[level - 1];
+            document.getElementById('pet-level-badge').innerText = `Lv. ${level}`; document.getElementById('xp-text').innerText = `${xp}/${nextLimit}`;
+            document.getElementById('progress-bar').style.width = `${Math.min(100, (xp / nextLimit) * 100)}%`;
+        }
+
+        function showPokedex() {
+            const t = langData[currLang]; let html = '<div class="grid grid-cols-2 gap-3 mt-4 overflow-y-auto max-h-[50vh] p-1">';
+            for(let i=0; i<5; i++) {
+                let unlocked = level > i; let cardClass = unlocked ? 'bg-white pet-glow border-2 border-amber-400' : 'bg-slate-100 border border-slate-200 pet-locked';
+                html += `<div class="pet-card rounded-xl flex flex-col items-center p-3 relative ${cardClass}"><div class="text-4xl mb-2">${petStages[i]}</div><span class="text-sm font-bold">${unlocked ? t.petNames[i] : '???'}</span></div>`;
+            }
+            Swal.fire({ title: `📖 ${t.nav[3]}`, html: html + '</div>', confirmButtonColor: '#4f46e5' });
+        }
+
+        window.handleSend = async () => {
+            const input = document.getElementById('user-input'); const text = input.value.trim(); if(!text) return;
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<div class="flex items-end gap-2 user-msg flex-row-reverse mb-2"><div class="bubble font-bold">${text}</div></div>`;
+            input.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.innerHTML += `<div id="typing" class="flex items-end gap-2 ai-msg mb-2"><div class="bubble flex items-center h-10 gap-1 px-3"><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div><div class="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style="animation-delay: 150ms"></div></div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            try {
+                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'}简短回答学生：${text}`}) });
+                const data = await res.json(); document.getElementById('typing').remove();
+                chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border">🤖</div><div class="bubble font-bold">${data.text.replace(/\n/g, '<br>')}</div></div>`;
+                playSound('jump');
+            } catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="bubble text-red-500">网络连接错误</div>`; }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); };
+        window.generateAI = async (idx) => { Swal.fire({title:'AI 分析中', didOpen:()=>Swal.showLoading()}); setTimeout(()=>Swal.fire('分析报告', '建议多练习语法。', 'info'), 1500); };
+        
+        document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
+        window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
+    </script>
+
+    <!-- Firebase 身份验证逻辑 (含 DELIMa 智能拦截系统 & 绝对覆盖控制) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
         
-        // 您的专属配置密钥
         const firebaseConfig = {
             apiKey: "AIzaSyCq1wRqEta9Ow-q67TOqbz2GnPq-caPuLQ",
             authDomain: "pandai-bahasa-cina.firebaseapp.com",
@@ -162,180 +350,111 @@
             appId: "1:160554837509:web:957d43650afc874e775e6c",
             measurementId: "G-SPMXMPKVQ2"
         };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        
+        let isRegisterMode = false; 
+        window.selectedRole = 'student'; 
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let isRegisterMode = false;
-        let selectedRole = 'student'; // 默认身份
-
-        // 身份按钮切换UI
-        window.setRole = (role) => {
-            selectedRole = role;
-            document.getElementById('role-student').classList.remove('selected');
-            document.getElementById('role-teacher').classList.remove('selected');
-            document.getElementById(`role-${role}`).classList.add('selected');
+        window.setRole = (role) => { 
+            window.selectedRole = role; 
+            document.getElementById('role-student').classList.remove('selected'); 
+            document.getElementById('role-teacher').classList.remove('selected'); 
+            document.getElementById(`role-${role}`).classList.add('selected'); 
         };
+        
+        window.toggleAuthMode = () => { isRegisterMode = !isRegisterMode; document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录进入系统'; };
 
-        // 切换登录/注册模式
-        window.toggleAuthMode = () => {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录';
-            document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册';
-            document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录进入系统';
-        };
+        // DELIMa 邮箱智能拦截规则
+        function validateDelimaEmail(email, role) {
+            const lowerEmail = email.toLowerCase();
+            if (isRegisterMode) {
+                if (role === 'teacher') {
+                    if (!lowerEmail.startsWith('g-') || !lowerEmail.includes('@moe-dl.edu.my')) {
+                        Swal.fire('❌ 权限拒绝', '教师账号必须使用以 "g-" 开头的 DELIMa 邮箱！<br><span class="text-sm text-gray-500">(例如: g-12345@moe-dl.edu.my)</span>', 'error');
+                        return false;
+                    }
+                } else if (role === 'student') {
+                    if (lowerEmail.startsWith('g-')) {
+                        Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请切换到【教师】身份进行操作！', 'warning');
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
-        // 邮箱密码 登录/注册 核心逻辑
         window.handleAuth = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
+            e.preventDefault(); 
+            const email = document.getElementById('auth-email').value; 
+            const password = document.getElementById('auth-password').value; 
             const name = document.getElementById('auth-name').value || email.split('@')[0];
+            
+            if (!validateDelimaEmail(email, window.selectedRole)) return;
 
             Swal.fire({ title: '处理中...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
             try {
+                let userUid = "";
                 if (isRegisterMode) {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    // 注册成功后，把身份存入数据库
-                    await setDoc(doc(db, "users", userCredential.user.uid), {
-                        name: name, email: email, role: selectedRole
-                    });
-                    Swal.close();
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    Swal.close();
+                    userUid = userCredential.user.uid;
+                } else { 
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password); 
+                    userUid = userCredential.user.uid;
                 }
-            } catch (error) {
-                Swal.fire('错误', error.message.replace('Firebase:', ''), 'error');
-            }
+                // 强制将界面上选中的身份写入数据库 (掌握绝对决定权)
+                await setDoc(doc(db, "users", userUid), { name: name, email: email, role: window.selectedRole }, { merge: true });
+                Swal.close();
+            } catch (error) { Swal.fire('错误', error.message.replace('Firebase:', ''), 'error'); }
         };
 
-        // Google 一键登录
         window.loginWithGoogle = async () => {
             const provider = new GoogleAuthProvider();
             try {
                 Swal.fire({ title: '连接 Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 const result = await signInWithPopup(auth, provider);
-                // 检查数据库有没有这个用户，如果没有则创建并绑定当前选择的身份
-                const docRef = doc(db, "users", result.user.uid);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    await setDoc(docRef, { name: result.user.displayName, email: result.user.email, role: selectedRole });
+                
+                if (isRegisterMode && !validateDelimaEmail(result.user.email, window.selectedRole)) {
+                    await signOut(auth); // 不符合规则，强制踢出
+                    return;
                 }
+
+                await setDoc(doc(db, "users", result.user.uid), { name: result.user.displayName, email: result.user.email, role: window.selectedRole }, { merge: true });
                 Swal.close();
-            } catch (error) {
-                Swal.fire('错误', 'Google 登录失败', 'error');
+            } catch (error) { 
+                if (error.code !== 'auth/popup-closed-by-user') {
+                    Swal.fire('错误', 'Google 登录失败，请确认白名单设置。', 'error'); 
+                }
             }
         };
 
-        // 忘记密码
         window.resetPassword = async () => {
-            const email = document.getElementById('auth-email').value;
-            if(!email) return Swal.fire('提示', '请先在上方输入您的电子邮件地址', 'info');
-            try {
-                await sendPasswordResetEmail(auth, email);
-                Swal.fire('已发送', '密码重置链接已发送到您的邮箱，请查收！', 'success');
-            } catch (error) {
-                Swal.fire('错误', '发送失败，请确保邮箱正确填写。', 'error');
-            }
+            const email = document.getElementById('auth-email').value; if(!email) return Swal.fire('提示', '请先在上方输入您的邮箱', 'info');
+            try { await sendPasswordResetEmail(auth, email); Swal.fire('已发送', '密码重置链接已发送到您的邮箱', 'success'); } catch (error) { Swal.fire('错误', '发送失败，请确保邮箱正确填写', 'error'); }
         };
-
-        // 退出登录
         window.logout = () => signOut(auth);
 
-        // ---------------- 监听用户登录状态 (核心路由系统) ----------------
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // 用户已登录：隐藏大厅，获取身份
-                document.getElementById('login-portal').style.opacity = '0';
-                setTimeout(() => document.getElementById('login-portal').classList.add('hidden'), 500);
+                document.getElementById('login-portal').style.opacity = '0'; setTimeout(() => document.getElementById('login-portal').classList.add('hidden'), 500);
+                const docSnap = await getDoc(doc(db, "users", user.uid));
                 
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
+                let role = window.selectedRole; 
+                let name = user.displayName || user.email.split('@')[0];
                 
-                let role = 'student'; let name = user.email.split('@')[0];
-                if (docSnap.exists()) {
-                    role = docSnap.data().role;
-                    name = docSnap.data().name;
+                if (docSnap.exists() && docSnap.data().role) { 
+                    role = docSnap.data().role; 
+                    name = docSnap.data().name || name; 
                 }
                 
                 document.getElementById('user-display-name').innerText = name;
-                document.getElementById('main-header').classList.remove('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-
-                // 根据身份配置菜单和界面
+                document.getElementById('main-header').classList.remove('hidden'); document.getElementById('main-content').classList.remove('hidden');
+                
                 window.configureLayout(role);
             } else {
-                // 用户未登录：显示大厅，隐藏主内容
-                document.getElementById('login-portal').classList.remove('hidden');
-                document.getElementById('login-portal').style.opacity = '1';
-                document.getElementById('main-header').classList.add('hidden');
-                document.getElementById('main-content').classList.add('hidden');
+                document.getElementById('login-portal').classList.remove('hidden'); document.getElementById('login-portal').style.opacity = '1';
+                document.getElementById('main-header').classList.add('hidden'); document.getElementById('main-content').classList.add('hidden');
             }
         });
-    </script>
-
-    <!-- UI 与 答题逻辑 -->
-    <script>
-        let isAudioInit = false; let currentRole = 'student';
-        
-        function initAudio() { if (isAudioInit) return; Tone.start(); isAudioInit = true; }
-        function toggleAudio() { initAudio(); }
-        function playSound() { initAudio(); }
-
-        window.configureLayout = (role) => {
-            currentRole = role;
-            const nav = document.getElementById('sidebar-nav');
-            nav.innerHTML = '';
-            
-            // 路由控制：只渲染符合身份的菜单
-            if(role === 'student') {
-                nav.innerHTML += `<button onclick="switchView('dashboard')" class="nav-btn active flex-1 p-2 bg-white rounded-xl shadow-sm text-sm font-bold">🏠 主页</button>`;
-                nav.innerHTML += `<button onclick="switchView('quiz')" class="nav-btn flex-1 p-2 bg-white rounded-xl shadow-sm text-sm font-bold">🎮 答题</button>`;
-                nav.innerHTML += `<button onclick="switchView('ai')" class="nav-btn flex-1 p-2 bg-white rounded-xl shadow-sm text-sm font-bold">🤖 AI</button>`;
-                switchView('dashboard');
-            } else {
-                nav.innerHTML += `<button onclick="switchView('teacher')" class="nav-btn active flex-1 p-2 bg-white rounded-xl shadow-sm text-sm font-bold">📊 数据</button>`;
-                nav.innerHTML += `<button onclick="switchView('ai')" class="nav-btn flex-1 p-2 bg-white rounded-xl shadow-sm text-sm font-bold">🤖 助手</button>`;
-                switchView('teacher');
-            }
-        };
-
-        window.switchView = (viewId) => {
-            ['view-dashboard', 'view-quiz', 'view-ai', 'view-teacher'].forEach(id => { 
-                document.getElementById(id).classList.add('hidden'); 
-            });
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            if(viewId === 'quiz') startQuiz();
-        };
-
-        function startQuiz() {
-            document.getElementById('game-question').innerText = "选择正确拼音：马来西亚";
-            document.getElementById('game-options').innerHTML = `<button class="quiz-btn" onclick="Swal.fire('正确!','+10 XP','success')">Mǎ lái xī yà</button><button class="quiz-btn" onclick="Swal.fire('错误','','error')">Mǎ lā xī yà</button>`;
-        }
-
-        async function handleSend() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim(); if(!text) return;
-            const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML += `<div class="flex items-end gap-2 flex-row-reverse mb-2"><div class="bubble bg-indigo-600 text-white font-bold p-3 rounded-xl rounded-br-sm">${text}</div></div>`;
-            input.value = '';
-            
-            // 调用 Render 服务器的 AI 接口
-            try {
-                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: text}) });
-                const data = await res.json();
-                chatBox.innerHTML += `<div class="flex items-end gap-2 mb-2"><div class="bubble bg-white border font-bold p-3 rounded-xl rounded-bl-sm">${data.text}</div></div>`;
-            } catch(e) {
-                chatBox.innerHTML += `<div class="bubble text-red-500">网络错误</div>`;
-            }
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        window.changeLang = (val) => { /* 保留原本翻译逻辑，此处精简以便阅读 */ };
     </script>
 </body>
 </html>
