@@ -22,8 +22,14 @@
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
         .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
-        .bounce-slow { animation: bounceSlow 3s infinite alternate ease-in-out; }
-        @keyframes bounceSlow { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+        /* 🌟 游戏化宠物专属动画 */
+        .pet-float { animation: floatAnim 3s ease-in-out infinite; }
+        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .pet-jump { animation: jumpAnim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        @keyframes jumpAnim { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.1); } }
+        .pet-shake { animation: shakeAnim 0.5s; }
+        @keyframes shakeAnim { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-5deg); } 75% { transform: translateX(10px) rotate(5deg); } }
+        
         .quiz-btn { background: rgba(255,255,255,0.9); border: 2px solid #e2e8f0; font-size: 1.1rem; font-weight: bold; padding: 1rem; border-radius: 12px; transition: all 0.1s; cursor: pointer; }
         .quiz-btn.correct { background: #22c55e; border-color: #16a34a; color: white;}
         .quiz-btn.wrong { background: #ef4444; border-color: #dc2626; color: white;}
@@ -118,18 +124,39 @@
                 <div class="bg-gradient-to-b from-white/90 to-white/60 w-full max-w-2xl rounded-3xl p-6 md:p-8 border border-white/80 shadow-lg backdrop-blur-md relative overflow-hidden text-center">
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-100/30 to-purple-100/30 pointer-events-none"></div>
                     <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-200 to-yellow-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-amber-300" id="pet-level-badge">Lv. 1</span>
+                    
                     <h3 id="ui-pet-title" class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 relative">我的学习萌宠</h3>
-                    <div class="flex flex-col items-center gap-2 mb-4 relative">
+                    
+                    <div class="flex flex-col items-center gap-2 mb-6 relative">
                         <span class="text-sm font-bold text-slate-500" id="ui-xp-label">XP: <span id="xp-text" class="text-indigo-600">0/50</span></span>
                         <div class="w-40 md:w-48 h-3 bg-slate-200/80 rounded-full overflow-hidden border border-slate-300/50 shadow-inner">
                             <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 transition-all duration-700" style="width: 0%"></div>
                         </div>
                     </div>
-                    <div class="text-7xl md:text-9xl my-4 bounce-slow cursor-pointer drop-shadow-2xl relative" id="pet-emoji" onclick="playSound('jump')">🥚</div>
-                    <h4 id="pet-name" class="text-2xl font-bold text-indigo-700 mt-2 relative drop-shadow-sm">灵力蛋</h4>
-                    <p id="ui-pet-desc" class="text-slate-600 font-bold text-sm md:text-base mt-2 relative">完成答题或对话任务，让宠物进化吧！</p>
                     
-                    <div class="flex flex-wrap justify-center gap-3 mt-6 relative">
+                    <div class="relative w-full max-w-sm mx-auto mb-6 flex flex-col items-center">
+                        <div id="pet-speech-bubble" class="absolute -top-12 opacity-0 transition-opacity duration-300 bg-white px-5 py-2 rounded-2xl shadow-lg border border-indigo-100 text-sm font-bold text-indigo-600 z-20 whitespace-nowrap">
+                            主人，今天学点什么呀？
+                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-indigo-100 transform rotate-45"></div>
+                        </div>
+                        
+                        <div class="relative group cursor-pointer" onclick="interactPet('touch')">
+                            <div class="text-8xl md:text-9xl relative z-10 pet-float drop-shadow-2xl transition-transform duration-300 group-hover:scale-110" id="pet-emoji">🥚</div>
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-8 bg-indigo-500/20 rounded-[100%] blur-md -z-10 group-hover:bg-indigo-400/40 transition-all"></div>
+                            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 w-20 h-3 bg-gradient-to-r from-indigo-300 to-purple-300 rounded-[100%] opacity-60 shadow-[0_0_15px_rgba(99,102,241,0.6)] -z-10"></div>
+                        </div>
+                    </div>
+
+                    <h4 id="pet-name" class="text-2xl font-bold text-indigo-700 mt-2 relative drop-shadow-sm">灵力蛋</h4>
+                    
+                    <div class="flex justify-center gap-3 mt-4 mb-6 relative">
+                        <button onclick="interactPet('feed')" class="bg-white/80 hover:bg-white border-2 border-rose-200 text-rose-500 px-4 py-2 rounded-full font-bold text-sm shadow-sm transition-transform active:scale-95 flex items-center gap-1"><span class="text-lg">🍎</span> 喂食 (+2 XP)</button>
+                        <button onclick="interactPet('play')" class="bg-white/80 hover:bg-white border-2 border-amber-200 text-amber-500 px-4 py-2 rounded-full font-bold text-sm shadow-sm transition-transform active:scale-95 flex items-center gap-1"><span class="text-lg">🎾</span> 玩耍</button>
+                    </div>
+                    
+                    <div class="h-px w-3/4 mx-auto bg-slate-200/50 my-6 relative"></div>
+
+                    <div class="flex flex-wrap justify-center gap-3 relative">
                         <button onclick="switchView('quiz')" class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all border border-indigo-400">▶️ 答题测验</button>
                         <button onclick="switchView('roleplay')" class="bg-gradient-to-r from-orange-400 to-amber-500 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#b45309] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 border border-orange-300">🎭 情景对话</button>
                         <button onclick="switchView('flashcard')" class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-5 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#0f766e] hover:translate-y-[2px] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 border border-teal-400">🎴 翻转记忆卡</button>
@@ -326,6 +353,38 @@
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
+        // 🌟 宠物养成系统核心交互逻辑
+        const petDialogues = ["主人，今天也要加油哦！", "知识就是力量！", "我好饿，快去答题赚XP喂我~", "摸摸我的头，好开心呀~", "你是我最棒的主人！"];
+        window.interactPet = (action) => {
+            playSound('jump');
+            const pet = document.getElementById('pet-emoji');
+            
+            // 触发动态跳跃动画
+            pet.classList.remove('pet-float');
+            pet.classList.add('pet-jump');
+            setTimeout(() => {
+                pet.classList.remove('pet-jump');
+                pet.classList.add('pet-float');
+            }, 500);
+
+            if(action === 'feed') {
+                showPetSpeech("吧唧吧唧...好美味！谢谢主人~ ❤️");
+                gainXP(2); // 喂食获得微量奖励
+            } else if(action === 'play') {
+                showPetSpeech("哈哈哈好痒好开心！😆");
+            } else {
+                showPetSpeech(petDialogues[Math.floor(Math.random() * petDialogues.length)]);
+            }
+        };
+
+        window.showPetSpeech = (text) => {
+            const bubble = document.getElementById('pet-speech-bubble');
+            bubble.innerHTML = `${text} <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-indigo-100 transform rotate-45"></div>`;
+            bubble.classList.remove('opacity-0');
+            // 3秒后自动隐藏
+            setTimeout(() => bubble.classList.add('opacity-0'), 3000);
+        };
+
         window.speakText = (text) => {
             if(!window.speechSynthesis) return Swal.fire('不支持', '浏览器不支持语音朗读功能', 'error');
             const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/BM:.*$/i, ''); 
@@ -416,7 +475,9 @@
             const t = langData.zh; const qData = t.quiz;
             if (currentQ >= qData.length) {
                 document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold drop-shadow-sm">恭喜完成！获得 ${gameScore*20} XP！🎉</span>`; document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2 shadow-md hover:shadow-lg border-indigo-200">返回主页</button>`;
-                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐"; playSound('levelup'); return;
+                document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐"; playSound('levelup'); 
+                showPetSpeech(`哇！完成了测验！获得了 ${gameScore*20} XP！`); // 答题完给宠物反馈
+                return;
             }
             document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`; document.getElementById('game-question').innerText = qData[currentQ].q; document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md hover:border-indigo-300" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
         }
@@ -424,7 +485,11 @@
         window.checkAnswer = (selectedIdx, btn) => {
             const t = langData.zh; const isCorrect = selectedIdx === t.quiz[currentQ].ans; document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) { btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20); } 
-            else { btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; }
+            else { 
+                btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); 
+                const pet = document.getElementById('pet-emoji'); pet.classList.add('pet-shake'); setTimeout(()=>pet.classList.remove('pet-shake'), 500); // 答错时宠物摇头
+                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; 
+            }
             setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
@@ -445,7 +510,7 @@
                 if(formattedText.includes('BM:') || formattedText.includes('Bahasa')) { formattedText = formattedText.replace(/(BM:|Bahasa Melayu:)(.*)/ig, '<span class="text-xs text-orange-600 mt-1 block border-t border-orange-100 pt-1">$1$2</span>'); }
                 const safeReadText = data.text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
                 chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 relative pr-10">${formattedText}<button onclick="window.speakText('${safeReadText}')" class="absolute top-2 right-2 text-xl opacity-60 hover:opacity-100">🔊</button></div></div>`; 
-                playSound('jump'); gainXP(10); 
+                playSound('jump'); gainXP(10); showPetSpeech('完成了一次对话！太棒啦！'); 
             } 
             catch(e) { document.getElementById('rp-typing').remove(); chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center text-xl shrink-0 border-2 border-white shadow-sm pb-1">🧑‍🍳</div><div class="bubble font-bold shadow-sm bg-white/90 border border-orange-100 text-orange-600">Aiya! 安娣没听清楚，你可以再说一次吗？</div></div>`; }
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -475,7 +540,6 @@
             recognition.onerror = () => { Swal.fire('录音失败', '未能听清您的声音，请检查麦克风权限。', 'error'); };
         };
 
-        // --- 🌟 真正调动 AI 的一键出题与预览修改机制 ---
         window.generateAIQuiz = () => { 
             Swal.fire({ 
                 title: '✨ AI 智能一键出题', 
@@ -529,7 +593,6 @@
             });
         }
 
-        // --- 🌟 真实的上传文件交互模拟 ---
         window.mockUploadMaterial = () => {
             Swal.fire({
                 title: '上传教学材料',
