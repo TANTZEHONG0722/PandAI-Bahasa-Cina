@@ -22,7 +22,7 @@
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
         .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
-        /* 悬浮动画增强 */
+        /* 悬浮与宠物动画 */
         .pet-float { animation: floatAnim 3s ease-in-out infinite; }
         @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .avatar-float { animation: floatAnim 3.5s ease-in-out infinite; } 
@@ -44,6 +44,7 @@
         .recording-pulse { animation: pulse-ring 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
+        /* 3D 记忆卡 */
         .flashcard { perspective: 1000px; cursor: pointer; width: 100%; max-width: 320px; height: 350px; margin: 0 auto; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
         .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
@@ -51,7 +52,7 @@
         .flashcard-front { background: linear-gradient(135deg, #ffffff, #f8fafc); }
         .flashcard-back { background: linear-gradient(135deg, #e0e7ff, #ffffff); transform: rotateY(180deg); border-color: #c7d2fe; }
 
-        /* 捏脸面板的选项按钮 */
+        /* 捏脸面板 */
         .avatar-opt-btn { flex-shrink: 0; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; background: white; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; font-weight: bold; color: #475569; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .avatar-opt-btn:hover { border-color: #818cf8; background: #e0e7ff; }
         .avatar-opt-btn.selected { border-color: #4f46e5; background: #4f46e5; color: white; }
@@ -139,7 +140,6 @@
                     </div>
                     
                     <div class="flex justify-center items-end gap-6 md:gap-12 mb-6 relative select-none">
-                        
                         <div class="flex flex-col items-center relative z-10 group">
                             <div class="bg-indigo-600 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full absolute -top-4 shadow-md z-20 transition-all group-hover:-translate-y-1">我的分身</div>
                             <div class="w-24 h-24 md:w-32 md:h-32 bg-indigo-50/80 border-4 border-white shadow-lg rounded-full overflow-hidden avatar-float transition-transform group-hover:scale-105 cursor-pointer" onclick="openAvatarBuilder()">
@@ -148,7 +148,6 @@
                             <div class="w-16 h-3 bg-indigo-500/20 rounded-[100%] blur-[4px] mt-2 group-hover:bg-indigo-400/40 transition-all"></div>
                             <button onclick="openAvatarBuilder()" class="mt-2 bg-white/90 border border-slate-200 text-slate-600 text-[10px] md:text-xs px-3 py-1 rounded-full font-bold shadow-sm hover:text-indigo-600 hover:border-indigo-300 transition-all active:scale-95">🧑‍🎨 捏脸换装</button>
                         </div>
-
                         <div class="flex flex-col items-center relative z-10 cursor-pointer group" onclick="interactPet('touch')">
                             <div id="pet-speech-bubble" class="absolute -top-12 opacity-0 transition-opacity duration-300 bg-white px-4 py-2 rounded-2xl shadow-lg border border-orange-100 text-xs font-bold text-orange-600 z-20 whitespace-nowrap">
                                 主人，陪我玩~
@@ -161,7 +160,6 @@
                                 <button onclick="event.stopPropagation(); interactPet('play')" class="bg-white/90 border border-amber-100 text-amber-500 text-[10px] md:text-xs px-2 py-1 rounded-full font-bold shadow-sm hover:bg-amber-50 active:scale-95 transition-all">🎾 玩耍</button>
                             </div>
                         </div>
-
                     </div>
                     
                     <div class="h-px w-3/4 mx-auto bg-slate-200/50 my-6 relative"></div>
@@ -277,7 +275,6 @@
             </div>
 
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-white/30 scrollable-area">
-                
                 <div class="bg-white/80 p-5 rounded-3xl shadow-lg border border-white/60 mb-6 backdrop-blur-md relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-200 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
                     <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2 relative">
@@ -363,24 +360,14 @@
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
-        // ====== ✨ 核心：数字分身 Avatar Builder 逻辑 ======
+        // 捏脸系统
         window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' };
-        
-        window.getAvatarUrl = (config) => {
-            return `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${config.skinColor}&top=${config.top}&clothing=${config.clothing}`;
-        };
-
-        window.updateAvatarUI = () => {
-            const url = window.getAvatarUrl(window.avatarConfig);
-            const img = document.getElementById('student-avatar-img');
-            if(img) img.src = url;
-        };
+        window.getAvatarUrl = (config) => { return `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${config.skinColor}&top=${config.top}&clothing=${config.clothing}`; };
+        window.updateAvatarUI = () => { const img = document.getElementById('student-avatar-img'); if(img) img.src = window.getAvatarUrl(window.avatarConfig); };
 
         window.openAvatarBuilder = () => {
-            // 安全的对象拷贝方式，取代扩展运算符，兼容旧设备
             let tempConfig = Object.assign({}, window.avatarConfig);
             playSound('click');
-
             const skins = [{ val: 'ffdbb4', label: '白皙 ✋🏻' }, { val: 'edb98a', label: '自然 ✋🏼' }, { val: 'd08b5b', label: '小麦 ✋🏽' }, { val: 'ae5d29', label: '深色 ✋🏾' }];
             const tops = [{ val: 'shortHairShortFlat', label: '清爽短发' }, { val: 'shortHairShortCurly', label: '卷短发' }, { val: 'shortHairSides', label: '两边剃短' }, { val: 'longHairStraight', label: '飘逸长发' }, { val: 'longHairBob', label: '波波头' }, { val: 'longHairCurly', label: '波浪长卷' }, { val: 'hijab', label: '头巾 Hijab' }, { val: 'turban', label: '包头 Turban' }];
             const clothes = [{ val: 'hoodie', label: '连帽衫' }, { val: 'blazerAndShirt', label: '校服衬衫' }, { val: 'collarAndSweater', label: '毛衣领' }, { val: 'graphicShirt', label: 'T恤衫' }, { val: 'overall', label: '背心外套' }];
@@ -399,19 +386,18 @@
                         <div class="w-32 h-32 bg-indigo-50 border-4 border-white shadow-lg rounded-full overflow-hidden mb-6 avatar-float">
                             <img id="swal-avatar-preview" src="${window.getAvatarUrl(tempConfig)}" class="w-full h-full object-cover">
                         </div>
-                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择肤色 (Skin):</div>
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择肤色:</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-skinColor">${renderBtns('skinColor', skins)}</div>
-                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择发型 (Hair):</div>
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择发型:</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-top">${renderBtns('top', tops)}</div>
-                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择服装 (Clothes):</div>
+                        <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择服装:</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-clothing">${renderBtns('clothing', clothes)}</div>
                     </div>
                 `,
                 showCancelButton: true, confirmButtonText: '✅ 保存形象', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', width: '500px',
                 didOpen: () => {
                     window.setTempAvatar = (key, val) => {
-                        tempConfig[key] = val;
-                        document.getElementById('swal-avatar-preview').src = window.getAvatarUrl(tempConfig);
+                        tempConfig[key] = val; document.getElementById('swal-avatar-preview').src = window.getAvatarUrl(tempConfig);
                         const group = document.getElementById('opt-grp-' + key);
                         if(group) {
                             group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
@@ -422,15 +408,13 @@
                 }
             }).then((res) => {
                 if (res.isConfirmed) {
-                    window.avatarConfig = Object.assign({}, tempConfig);
-                    window.updateAvatarUI();
+                    window.avatarConfig = Object.assign({}, tempConfig); window.updateAvatarUI();
                     Swal.fire({title: '保存成功', text: '你的新形象真好看！', icon: 'success', timer: 1500, showConfirmButton: false});
                     if (window.saveAvatarToFirebase) window.saveAvatarToFirebase(window.avatarConfig);
                 }
             });
         };
 
-        // ====== 宠物交互与系统基础功能 ======
         const petDialogues = ["主人，今天也要加油哦！", "知识就是力量！", "多带我出去兜风好不好~", "摸摸我的头，好开心呀~", "你是我最棒的主人！"];
         window.interactPet = (action) => {
             playSound('jump'); const pet = document.getElementById('pet-emoji');
@@ -452,6 +436,9 @@
             window.speechSynthesis.speak(utterance);
         };
 
+        const flashcardsData = [ { zh: '学校', py: 'xué xiào', ms: 'Sekolah' }, { zh: '老师', py: 'lǎo shī', ms: 'Cikgu / Guru' }, { zh: '朋友', py: 'péng yǒu', ms: 'Kawan' }, { zh: '学习', py: 'xué xí', ms: 'Belajar' }, { zh: '马来西亚', py: 'mǎ lái xī yà', ms: 'Malaysia' } ];
+        let currentCardIdx = 0;
+        
         function loadFlashcard() {
             const card = flashcardsData[currentCardIdx]; document.getElementById('fc-card').classList.remove('flipped');
             setTimeout(() => {
@@ -472,31 +459,34 @@
         function toggleAudio() { if (!isAudioInit) { initAudio(); return; } Tone.Destination.mute = !Tone.Destination.mute; document.getElementById('sound-icon').innerText = Tone.Destination.mute ? "🔇" : "🔊"; }
         function playSound(type) {
             if (!isAudioInit || Tone.Destination.mute || !synths.click) return; 
-            try { const now = Tone.now(); if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now); if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); } if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now); if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); } } catch(e) { console.log('Audio blocked'); }
+            try {
+                const now = Tone.now();
+                if (type === 'click' || type === 'jump') synths.click.triggerAttackRelease("E5", "32n", now);
+                if (type === 'correct') { synths.coin.triggerAttackRelease("C5", "16n", now); synths.coin.triggerAttackRelease("E5", "16n", now+0.1); }
+                if (type === 'wrong') synths.wrong.triggerAttackRelease("C2", "8n", now);
+                if (type === 'levelup') { synths.win.triggerAttackRelease(["C4", "E4", "G4"], "8n", now); synths.win.triggerAttackRelease(["E4", "G4", "C5"], "2n", now+0.2); }
+            } catch(e) { console.log('Audio error'); }
         }
 
         window.changeLang = (lang) => {
-            currLang = lang; const t = langData.zh; document.getElementById('xp-text').innerText = `${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}`;
+            currLang = lang; const t = langData.zh;
+            document.getElementById('xp-text').innerText = `${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}`;
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white/90 border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">${p}</button>`; });
             renderNav(); 
-            const qView = document.getElementById('view-quiz');
-            if(qView && !qView.classList.contains('hidden')) loadQuestion();
         }
 
         function renderNav() {
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
             const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 3]; 
             allowedIndices.forEach(i => {
-                const navItem = navIcons[i]; const title = langData.zh.nav[i]; const btn = document.createElement('button');
+                const navItem = navIcons[i]; const title = langData.zh.nav[i]; 
+                const btn = document.createElement('button');
                 btn.setAttribute('data-target', navItem.id); 
                 btn.className = `nav-btn flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-2 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-3 hover:bg-white/70 transition-all`;
                 
-                // 【核心修复】不使用可选链 ?., 确保全设备兼容！
                 const viewEl = document.getElementById('view-' + navItem.id);
-                if(viewEl && !viewEl.classList.contains('hidden')) {
-                    btn.classList.add('active');
-                }
+                if(viewEl && !viewEl.classList.contains('hidden')) { btn.classList.add('active'); }
                 
                 btn.onclick = () => { playSound('click'); switchView(navItem.id); if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
@@ -504,31 +494,13 @@
             });
         }
 
-        window.configureLayout = (role, currentXp = 0) => { 
-            currentRole = role; xp = currentXp || 0; 
-            recalcLevel(xp); 
-            changeLang(currLang); 
-            switchView(role === 'student' ? 'dashboard' : 'teacher'); 
-            if(role === 'teacher') { 
-                setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); 
-            } 
-            window.updateAvatarUI(); 
-        };
+        window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } window.updateAvatarUI(); };
         
         window.switchView = (viewId) => { 
             const views = ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'];
-            views.forEach(id => { 
-                const el = document.getElementById(id); 
-                if(el) el.classList.add('hidden'); 
-            }); 
-            
-            const targetEl = document.getElementById('view-' + viewId); 
-            if(targetEl) targetEl.classList.remove('hidden'); 
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => { 
-                if (btn.getAttribute('data-target') === viewId) btn.classList.add('active'); 
-                else btn.classList.remove('active'); 
-            });
+            views.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }); 
+            const targetEl = document.getElementById('view-' + viewId); if(targetEl) targetEl.classList.remove('hidden'); 
+            document.querySelectorAll('.nav-btn').forEach(btn => { if (btn.getAttribute('data-target') === viewId) btn.classList.add('active'); else btn.classList.remove('active'); });
             if(viewId === 'quiz') startQuiz(); 
         };
 
@@ -545,7 +517,11 @@
         window.checkAnswer = (selectedIdx, btn) => {
             const t = langData.zh; const isCorrect = selectedIdx === t.quiz[currentQ].ans; document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) { btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20); } 
-            else { btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); const pet = document.getElementById('pet-emoji'); pet.classList.add('pet-shake'); setTimeout(()=>pet.classList.remove('pet-shake'), 500); setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; }
+            else { 
+                btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct'); 
+                const pet = document.getElementById('pet-emoji'); pet.classList.add('pet-shake'); setTimeout(()=>pet.classList.remove('pet-shake'), 500);
+                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return; 
+            }
             setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
