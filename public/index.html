@@ -22,10 +22,10 @@
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
         .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
-        /* 🌟 悬浮动画增强 */
+        /* 悬浮动画增强 */
         .pet-float { animation: floatAnim 3s ease-in-out infinite; }
         @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .avatar-float { animation: floatAnim 3.5s ease-in-out infinite; } /* 稍微错开时间，显得自然 */
+        .avatar-float { animation: floatAnim 3.5s ease-in-out infinite; } 
         .pet-jump { animation: jumpAnim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes jumpAnim { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-25px) scale(1.1); } }
         .pet-shake { animation: shakeAnim 0.5s; }
@@ -364,90 +364,67 @@
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student'; let radarChartInstance = null;
 
         // ====== ✨ 核心：数字分身 Avatar Builder 逻辑 ======
-        // 默认形象配置
         window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' };
         
-        // 构建 API URL
         window.getAvatarUrl = (config) => {
             return `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${config.skinColor}&top=${config.top}&clothing=${config.clothing}`;
         };
 
-        // 更新界面上的头像
         window.updateAvatarUI = () => {
-            const url = getAvatarUrl(window.avatarConfig);
+            const url = window.getAvatarUrl(window.avatarConfig);
             const img = document.getElementById('student-avatar-img');
             if(img) img.src = url;
         };
 
-        // 打开捏脸中心
         window.openAvatarBuilder = () => {
-            let tempConfig = { ...window.avatarConfig };
+            // 安全的对象拷贝方式，取代扩展运算符，兼容旧设备
+            let tempConfig = Object.assign({}, window.avatarConfig);
             playSound('click');
 
-            // 选项数据
-            const skins = [
-                { val: 'ffdbb4', label: '白皙 ✋🏻' }, { val: 'edb98a', label: '自然 ✋🏼' }, 
-                { val: 'd08b5b', label: '小麦 ✋🏽' }, { val: 'ae5d29', label: '深色 ✋🏾' }
-            ];
-            const tops = [
-                { val: 'shortHairShortFlat', label: '清爽短发' }, { val: 'shortHairShortCurly', label: '卷短发' }, 
-                { val: 'shortHairSides', label: '两边剃短' }, { val: 'longHairStraight', label: '飘逸长发' }, 
-                { val: 'longHairBob', label: '波波头' }, { val: 'longHairCurly', label: '波浪长卷' }, 
-                { val: 'hijab', label: '头巾 Hijab' }, { val: 'turban', label: '包头 Turban' }
-            ];
-            const clothes = [
-                { val: 'hoodie', label: '连帽衫' }, { val: 'blazerAndShirt', label: '校服衬衫' }, 
-                { val: 'collarAndSweater', label: '毛衣领' }, { val: 'graphicShirt', label: 'T恤衫' }, 
-                { val: 'overall', label: '背心外套' }
-            ];
+            const skins = [{ val: 'ffdbb4', label: '白皙 ✋🏻' }, { val: 'edb98a', label: '自然 ✋🏼' }, { val: 'd08b5b', label: '小麦 ✋🏽' }, { val: 'ae5d29', label: '深色 ✋🏾' }];
+            const tops = [{ val: 'shortHairShortFlat', label: '清爽短发' }, { val: 'shortHairShortCurly', label: '卷短发' }, { val: 'shortHairSides', label: '两边剃短' }, { val: 'longHairStraight', label: '飘逸长发' }, { val: 'longHairBob', label: '波波头' }, { val: 'longHairCurly', label: '波浪长卷' }, { val: 'hijab', label: '头巾 Hijab' }, { val: 'turban', label: '包头 Turban' }];
+            const clothes = [{ val: 'hoodie', label: '连帽衫' }, { val: 'blazerAndShirt', label: '校服衬衫' }, { val: 'collarAndSweater', label: '毛衣领' }, { val: 'graphicShirt', label: 'T恤衫' }, { val: 'overall', label: '背心外套' }];
 
-            // 生成选项 HTML
-            const renderBtns = (key, arr) => arr.map(item => `
-                <button onclick="window.setTempAvatar('${key}', '${item.val}')" class="avatar-opt-btn ${tempConfig[key] === item.val ? 'selected' : ''}" id="btn-${key}-${item.val}">
-                    ${item.label}
-                </button>
-            `).join('');
+            const renderBtns = (key, arr) => {
+                return arr.map(item => {
+                    const isSelected = tempConfig[key] === item.val ? 'selected' : '';
+                    return `<button onclick="window.setTempAvatar('${key}', '${item.val}')" class="avatar-opt-btn ${isSelected}" id="btn-${key}-${item.val}">${item.label}</button>`;
+                }).join('');
+            };
 
             Swal.fire({
                 title: '🧑‍🎨 捏脸换装中心',
                 html: `
                     <div class="flex flex-col items-center w-full max-w-sm mx-auto">
                         <div class="w-32 h-32 bg-indigo-50 border-4 border-white shadow-lg rounded-full overflow-hidden mb-6 avatar-float">
-                            <img id="swal-avatar-preview" src="${getAvatarUrl(tempConfig)}" class="w-full h-full object-cover">
+                            <img id="swal-avatar-preview" src="${window.getAvatarUrl(tempConfig)}" class="w-full h-full object-cover">
                         </div>
-                        
                         <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择肤色 (Skin):</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-skinColor">${renderBtns('skinColor', skins)}</div>
-
                         <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择发型 (Hair):</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-top">${renderBtns('top', tops)}</div>
-
                         <div class="w-full text-left text-sm font-bold text-slate-500 mb-2">选择服装 (Clothes):</div>
                         <div class="flex gap-2 w-full overflow-x-auto pb-3 mb-2 scrollbar-hide" id="opt-grp-clothing">${renderBtns('clothing', clothes)}</div>
                     </div>
                 `,
                 showCancelButton: true, confirmButtonText: '✅ 保存形象', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', width: '500px',
                 didOpen: () => {
-                    // SWAL 内部交互逻辑
                     window.setTempAvatar = (key, val) => {
                         tempConfig[key] = val;
-                        document.getElementById('swal-avatar-preview').src = getAvatarUrl(tempConfig);
-                        // 更新按钮选中状态
-                        const group = document.getElementById(`opt-grp-${key}`);
+                        document.getElementById('swal-avatar-preview').src = window.getAvatarUrl(tempConfig);
+                        const group = document.getElementById('opt-grp-' + key);
                         if(group) {
                             group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-                            const selectedBtn = document.getElementById(`btn-${key}-${val}`);
+                            const selectedBtn = document.getElementById('btn-' + key + '-' + val);
                             if(selectedBtn) selectedBtn.classList.add('selected');
                         }
                     };
                 }
-            }).then(async (res) => {
+            }).then((res) => {
                 if (res.isConfirmed) {
-                    window.avatarConfig = { ...tempConfig };
+                    window.avatarConfig = Object.assign({}, tempConfig);
                     window.updateAvatarUI();
                     Swal.fire({title: '保存成功', text: '你的新形象真好看！', icon: 'success', timer: 1500, showConfirmButton: false});
-                    
-                    // 存储到云端
                     if (window.saveAvatarToFirebase) window.saveAvatarToFirebase(window.avatarConfig);
                 }
             });
@@ -502,7 +479,9 @@
             currLang = lang; const t = langData.zh; document.getElementById('xp-text').innerText = `${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}`;
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white/90 border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 transition-all">${p}</button>`; });
-            renderNav(); if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
+            renderNav(); 
+            const qView = document.getElementById('view-quiz');
+            if(qView && !qView.classList.contains('hidden')) loadQuestion();
         }
 
         function renderNav() {
@@ -512,19 +491,44 @@
                 const navItem = navIcons[i]; const title = langData.zh.nav[i]; const btn = document.createElement('button');
                 btn.setAttribute('data-target', navItem.id); 
                 btn.className = `nav-btn flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-2 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-3 hover:bg-white/70 transition-all`;
-                if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
+                
+                // 【核心修复】不使用可选链 ?., 确保全设备兼容！
+                const viewEl = document.getElementById('view-' + navItem.id);
+                if(viewEl && !viewEl.classList.contains('hidden')) {
+                    btn.classList.add('active');
+                }
+                
                 btn.onclick = () => { playSound('click'); switchView(navItem.id); if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
 
-        window.configureLayout = (role, currentXp = 0) => { currentRole = role; xp = currentXp || 0; recalcLevel(xp); changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); if(role === 'teacher') { setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); } window.updateAvatarUI(); };
+        window.configureLayout = (role, currentXp = 0) => { 
+            currentRole = role; xp = currentXp || 0; 
+            recalcLevel(xp); 
+            changeLang(currLang); 
+            switchView(role === 'student' ? 'dashboard' : 'teacher'); 
+            if(role === 'teacher') { 
+                setTimeout(initRadarChart, 100); setTimeout(window.fetchLeaderboard, 200); 
+            } 
+            window.updateAvatarUI(); 
+        };
         
         window.switchView = (viewId) => { 
-            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }); 
-            const targetEl = document.getElementById(`view-${viewId}`); if(targetEl) targetEl.classList.remove('hidden'); 
-            document.querySelectorAll('.nav-btn').forEach(btn => { if (btn.getAttribute('data-target') === viewId) btn.classList.add('active'); else btn.classList.remove('active'); });
+            const views = ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'];
+            views.forEach(id => { 
+                const el = document.getElementById(id); 
+                if(el) el.classList.add('hidden'); 
+            }); 
+            
+            const targetEl = document.getElementById('view-' + viewId); 
+            if(targetEl) targetEl.classList.remove('hidden'); 
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => { 
+                if (btn.getAttribute('data-target') === viewId) btn.classList.add('active'); 
+                else btn.classList.remove('active'); 
+            });
             if(viewId === 'quiz') startQuiz(); 
         };
 
@@ -643,7 +647,6 @@
         let isRegisterMode = false; window.selectedRole = 'student'; window.activeTimer = null; let hidePortalTimeout = null;
         
         window.updateFirebaseXP = async (newXP) => { if(auth.currentUser) { await setDoc(doc(db, "users", auth.currentUser.uid), { xp: newXP }, { merge: true }); } };
-        // 🌟 新增：保存头像配置到 Firebase
         window.saveAvatarToFirebase = async (config) => { if(auth.currentUser) { await setDoc(doc(db, "users", auth.currentUser.uid), { avatarConfig: config }, { merge: true }); } };
 
         window.fetchLeaderboard = async () => {
@@ -664,10 +667,7 @@
                     const userXp = data.xp || 0; const sec = data.activeSeconds || 0; const mins = Math.floor(sec / 60); const remainSec = sec % 60; const timeStr = mins > 0 ? `${mins}分 ${remainSec}秒` : `${sec}秒`;
                     const userStreak = data.streak || 1;
                     
-                    // 获取玩家的专属头像，如果没有则使用默认
-                    const avatarUrl = data.avatarConfig 
-                        ? `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${data.avatarConfig.skinColor}&top=${data.avatarConfig.top}&clothing=${data.avatarConfig.clothing}` 
-                        : `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}&backgroundColor=e0e7ff`;
+                    const avatarUrl = data.avatarConfig ? `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${data.avatarConfig.skinColor}&top=${data.avatarConfig.top}&clothing=${data.avatarConfig.clothing}` : `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}&backgroundColor=e0e7ff`;
 
                     let statusHtml = '';
                     if (sec > 300) statusHtml = '<span class="text-green-700 bg-green-100 px-2 py-1 rounded border border-green-300">🌟 勤奋好学</span>';
@@ -678,22 +678,7 @@
                     let medal = `<span class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-md text-xs border border-white z-20">${rank}</span>`;
                     if(rank === 1) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥇</span>`; if(rank === 2) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥈</span>`; if(rank === 3) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥉</span>`;
                     
-                    // 🌟 更新排行榜 UI：现在展示学生的数字分身！
-                    html += `
-                        <div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors">
-                            <div class="flex items-center gap-4">
-                                <div class="relative w-12 h-12 rounded-full bg-indigo-50 border-2 border-white shadow-sm">
-                                    ${medal}
-                                    <img src="${avatarUrl}" class="w-full h-full object-cover rounded-full">
-                                </div>
-                                <div>
-                                    <div class="font-bold text-slate-700 flex items-center gap-1">${data.name || '神秘学者'} <span class="text-[10px] text-orange-500 bg-orange-50 px-1 rounded border border-orange-100">🔥${userStreak}</span></div>
-                                    <div class="text-xs text-slate-400">在线时长: ${timeStr}</div>
-                                </div>
-                            </div>
-                            <div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div>
-                        </div>`;
-                        
+                    html += `<div class="flex items-center justify-between p-4 border-b border-slate-100/50 hover:bg-white/50 transition-colors"><div class="flex items-center gap-4"><div class="relative w-12 h-12 rounded-full bg-indigo-50 border-2 border-white shadow-sm">${medal}<img src="${avatarUrl}" class="w-full h-full object-cover rounded-full"></div><div><div class="font-bold text-slate-700 flex items-center gap-1">${data.name || '神秘学者'} <span class="text-[10px] text-orange-500 bg-orange-50 px-1 rounded border border-orange-100">🔥${userStreak}</span></div><div class="text-xs text-slate-400">在线时长: ${timeStr}</div></div></div><div class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">${userXp} XP</div></div>`;
                     teacherHtml += `<tr class="border-t border-slate-200/60 hover:bg-white/50"><td class="p-3 font-bold text-slate-700 flex items-center gap-2"><img src="${avatarUrl}" class="w-8 h-8 rounded-full bg-indigo-50 border border-white shadow-sm"> ${data.name || '未命名'}</td><td class="p-3 text-indigo-600 font-bold">${userXp} XP</td><td class="p-3 text-emerald-600 font-bold">${timeStr}</td><td class="p-3 text-center font-bold text-orange-500">🔥 ${userStreak} 天</td></tr>`;
                     rank++;
                 });
@@ -747,7 +732,7 @@
         window.logout = async () => { 
             if(window.activeTimer) clearInterval(window.activeTimer); 
             document.getElementById('main-header').classList.add('hidden'); document.getElementById('main-content').classList.add('hidden');
-            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['view-dashboard', 'view-roleplay', 'view-flashcard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
             await signOut(auth); goBackToStep1(); 
         };
 
@@ -763,7 +748,6 @@
                     const data = docSnap.data();
                     if(data.role) role = data.role; if(data.name) name = data.name; if(data.xp) userXp = data.xp; 
                     
-                    // 🌟 加载用户的头像数据
                     if(data.avatarConfig) { window.avatarConfig = data.avatarConfig; }
                     else { window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' }; }
                     
