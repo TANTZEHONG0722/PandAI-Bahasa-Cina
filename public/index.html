@@ -18,15 +18,8 @@
         
         .glass-panel { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
         
-        /* 🌟 修复后的高颜值侧边栏按钮 CSS */
         .nav-btn { transition: all 0.3s; border: 2px solid transparent; }
-        .nav-btn.active { 
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.85), rgba(124, 58, 237, 0.85)); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); 
-            transform: translateY(-2px); 
-            border-color: rgba(255, 255, 255, 0.3);
-        }
+        .nav-btn.active { background: linear-gradient(135deg, rgba(79, 70, 229, 0.85), rgba(124, 58, 237, 0.85)); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.3); }
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
         .nav-btn.active .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1)); border: 1px solid rgba(255,255,255,0.4); color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
@@ -248,24 +241,35 @@
             </div>
 
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-white/30 scrollable-area">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl md:text-2xl font-bold text-slate-800 drop-shadow-sm">📊 教师数据大屏</h2>
-                    <div class="flex gap-2">
-                        <button onclick="window.fetchLeaderboard()" class="bg-white/80 hover:bg-white text-indigo-600 px-3 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-1 border border-indigo-200">🔄 刷新状态</button>
-                        <button onclick="generateAIQuiz()" class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md transition-colors flex items-center gap-1 border border-indigo-300">✨ AI 一键出题</button>
+                
+                <div class="bg-white/80 p-5 rounded-3xl shadow-lg border border-white/60 mb-6 backdrop-blur-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-200 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
+                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2 relative">
+                        🚀 AI 智能备课中心 
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200 shadow-sm">超越 Classroom</span>
+                    </h3>
+                    <div class="flex flex-col md:flex-row gap-4 relative">
+                        <button onclick="mockUploadMaterial()" class="flex-1 bg-slate-50/80 hover:bg-white border-2 border-dashed border-slate-300 hover:border-indigo-400 hover:shadow-md rounded-2xl p-5 text-center transition-all group">
+                            <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">📄</div>
+                            <div class="font-bold text-slate-700">上传课件/阅读材料</div>
+                            <div class="text-xs text-slate-500 mt-1">AI 自动提取生词并生成作业</div>
+                        </button>
+                        <button onclick="switchView('ai')" class="flex-1 bg-slate-50/80 hover:bg-white border-2 border-dashed border-slate-300 hover:border-purple-400 hover:shadow-md rounded-2xl p-5 text-center transition-all group">
+                            <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">💬</div>
+                            <div class="font-bold text-slate-700">与 AI 助教探讨教案</div>
+                            <div class="text-xs text-slate-500 mt-1">定制化教学方案与课堂互动</div>
+                        </button>
+                        <button onclick="generateAIQuiz()" class="flex-1 bg-slate-50/80 hover:bg-white border-2 border-dashed border-slate-300 hover:border-amber-400 hover:shadow-md rounded-2xl p-5 text-center transition-all group">
+                            <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">✨</div>
+                            <div class="font-bold text-slate-700">AI 一键出题发布</div>
+                            <div class="text-xs text-slate-500 mt-1">智能编写练习并推送给学生</div>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="bg-gradient-to-r from-indigo-500/90 to-purple-600/90 rounded-2xl p-5 mb-6 shadow-lg border border-white/20 text-white flex flex-col md:flex-row justify-between items-center gap-4 backdrop-blur-md">
-                    <div class="text-center md:text-left">
-                        <h3 class="font-bold text-lg drop-shadow-sm flex items-center justify-center md:justify-start gap-2">🗄️ 数据库实时用户总量</h3>
-                        <p class="text-indigo-100 text-sm mt-1">实时拉取自 Firebase Cloud Firestore</p>
-                    </div>
-                    <div class="flex gap-4 md:gap-6 text-center">
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-total">...</div><div class="text-xs text-indigo-100 font-bold mt-1">总计账号</div></div>
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-students">...</div><div class="text-xs text-indigo-100 font-bold mt-1">学生 (m-)</div></div>
-                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20"><div class="text-2xl font-bold drop-shadow-md" id="stat-teachers">...</div><div class="text-xs text-indigo-100 font-bold mt-1">教师 (g-)</div></div>
-                    </div>
+                <div class="flex justify-between items-center mb-4 mt-8">
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-800 drop-shadow-sm flex items-center gap-2">📊 学情雷达与表现</h2>
+                    <button onclick="window.fetchLeaderboard()" class="bg-white/80 hover:bg-white text-indigo-600 px-3 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-1 border border-indigo-200">🔄 刷新数据</button>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -282,18 +286,30 @@
                         <div class="bg-gradient-to-br from-amber-50/90 to-orange-100/90 p-4 rounded-2xl border border-white/60 shadow-lg flex flex-col justify-center backdrop-blur-md">
                             <span class="text-slate-600 font-bold text-sm">最弱知识点</span>
                             <span class="text-xl font-bold text-orange-700 mt-1 drop-shadow-sm">多音多义字</span>
-                            <button onclick="Swal.fire('已生成','已自动为您推送5道相关习题到学生端！','success')" class="text-xs bg-white/80 text-orange-600 border border-orange-300 rounded px-2 py-1 mt-2 w-max hover:bg-white font-bold shadow-sm">一键 AI 补救出题</button>
+                            <button onclick="generateAIQuiz()" class="text-xs bg-white/80 text-orange-600 border border-orange-300 rounded px-2 py-1 mt-2 w-max hover:bg-white font-bold shadow-sm">一键生成补救练习</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white/90 rounded-xl shadow-lg border border-white/60 overflow-hidden backdrop-blur-md">
+                <div class="bg-white/90 rounded-xl shadow-lg border border-white/60 overflow-hidden backdrop-blur-md mb-6">
                     <table class="w-full text-left min-w-[500px]">
                         <thead class="bg-slate-100/90 text-slate-600 text-sm md:text-base border-b border-slate-200">
                             <tr><th class="p-3 font-bold">学生姓名</th><th class="p-3 font-bold">总 XP</th><th class="p-3 font-bold">活跃时长 ⏱️</th><th class="p-3 font-bold text-center">连续打卡</th></tr>
                         </thead>
                         <tbody class="text-sm md:text-base" id="teacher-table-body"></tbody>
                     </table>
+                </div>
+
+                <div class="bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-5 mb-4 shadow-lg border border-slate-600 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="text-center md:text-left">
+                        <h3 class="font-bold text-lg drop-shadow-sm flex items-center justify-center md:justify-start gap-2">🗄️ 数据库实时连接状态</h3>
+                        <p class="text-slate-300 text-sm mt-1">云端数据由 Firebase Cloud Firestore 提供支持</p>
+                    </div>
+                    <div class="flex gap-4 md:gap-6 text-center">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10"><div class="text-2xl font-bold text-indigo-300" id="stat-total">...</div><div class="text-xs text-slate-300 font-bold mt-1">总计账号</div></div>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10"><div class="text-2xl font-bold text-emerald-300" id="stat-students">...</div><div class="text-xs text-slate-300 font-bold mt-1">学生 (m-)</div></div>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/10"><div class="text-2xl font-bold text-purple-300" id="stat-teachers">...</div><div class="text-xs text-slate-300 font-bold mt-1">教师 (g-)</div></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -366,13 +382,11 @@
                 const navItem = navIcons[i]; const title = langData.zh.nav[i]; 
                 const btn = document.createElement('button');
                 btn.setAttribute('data-target', navItem.id); 
-                // 🌟 修复：移除 md:flex-1，使用 md:flex-none，避免在电脑端被过度拉伸
                 btn.className = `nav-btn flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-2 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-white/50 md:mb-3 hover:bg-white/70 transition-all`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
                 
                 btn.onclick = () => { 
-                    playSound('click'); 
-                    switchView(navItem.id); 
+                    playSound('click'); switchView(navItem.id); 
                     if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard(); 
                     if(navItem.id === 'teacher') { initRadarChart(); window.fetchLeaderboard(); } 
                 };
@@ -462,6 +476,77 @@
             recognition.onerror = () => { Swal.fire('录音失败', '未能听清您的声音，请检查麦克风权限。', 'error'); };
         };
 
+        // --- 🌟 绝杀功能 1：教师 AI 一键出题 (带预览和拦截) ---
+        window.generateAIQuiz = () => { 
+            Swal.fire({ 
+                title: '✨ AI 智能一键出题', 
+                input: 'text', 
+                inputLabel: '请输入您想测试的课文主题或知识点', 
+                inputPlaceholder: '例如：中秋节、多音多义字、环保...', 
+                showCancelButton: true, confirmButtonText: '生成预览', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', 
+                preConfirm: (topic) => { if (!topic) Swal.showValidationMessage('请输入主题！'); return topic; } 
+            }).then((result) => { 
+                if (result.isConfirmed) { 
+                    Swal.fire({ title: 'AI 正在编写题目...', html: '正在融合 KSSR 最新大纲进行生成', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
+                    setTimeout(() => { 
+                        Swal.fire({
+                            title: '📝 题目预览与编辑',
+                            html: `
+                                <div class="text-left text-sm space-y-3 mt-4 max-h-60 overflow-y-auto p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-100">
+                                        <div class="font-bold text-slate-800">1. "${result.value}" 相关的正确拼音是？</div>
+                                        <div class="text-slate-600 ml-4 mt-2 flex gap-4"><span class="bg-indigo-50 px-2 rounded">A) 选项一</span> <span>B) 选项二</span> <span>C) 选项三</span></div>
+                                    </div>
+                                    <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-100">
+                                        <div class="font-bold text-slate-800">2. 下列哪个句子正确使用了相关词语？</div>
+                                        <div class="text-slate-600 ml-4 mt-2 flex gap-4"><span>A) 句子一</span> <span class="bg-indigo-50 px-2 rounded">B) 句子二</span> <span>C) 句子三</span></div>
+                                    </div>
+                                    <div class="text-xs text-slate-400 text-center mt-3">* 老师，您可以直接在这里点击修改题目和选项。</div>
+                                </div>
+                            `,
+                            showCancelButton: true,
+                            confirmButtonText: '✅ 确认无误，下发给全班',
+                            cancelButtonText: '重新生成',
+                            confirmButtonColor: '#10b981',
+                            width: '600px'
+                        }).then((reviewRes) => {
+                            if (reviewRes.isConfirmed) {
+                                Swal.fire('发布成功！', '题目已实时推送到全班学生的手机终端，学生完成将获得奖励！', 'success'); 
+                            } else if (reviewRes.dismiss === Swal.DismissReason.cancel) {
+                                window.generateAIQuiz(); // 用户点击重新生成
+                            }
+                        });
+                    }, 2000); 
+                } 
+            }); 
+        };
+
+        // --- 🌟 绝杀功能 2：教师上传材料 AI 分析互动 ---
+        window.mockUploadMaterial = () => {
+            Swal.fire({
+                title: '上传教学材料',
+                html: '<div class="border-2 border-dashed border-indigo-300 rounded-2xl p-8 bg-indigo-50 text-indigo-500 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100 transition-colors" id="mock-upload-zone"><div class="text-5xl mb-3">📁</div><div class="font-bold text-lg">点击选择文件 或 拖拽到此处</div><span class="text-xs text-indigo-400">支持 PDF, Word, PPT 或 图片格式</span></div>',
+                showConfirmButton: false, showCancelButton: true, cancelButtonText: '取消',
+                didOpen: () => {
+                    document.getElementById('mock-upload-zone').addEventListener('click', () => {
+                        Swal.fire({ title: 'AI 深度分析中...', html: '正在阅读材料并提取核心考点', timer: 2500, timerProgressBar: true, didOpen: () => Swal.showLoading() }).then(() => {
+                            Swal.fire({
+                                title: '✨ 分析完成！',
+                                html: `
+                                    <p class="text-sm text-left mb-4 text-slate-600">PandAI 助手已从您的材料中成功提取了 <b class="text-indigo-600">12</b> 个核心生词和 <b class="text-purple-600">3</b> 个关键语法句型。</p>
+                                    <div class="flex flex-col gap-3">
+                                        <button onclick="Swal.clickConfirm(); setTimeout(generateAIQuiz, 300)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">👉 立刻根据材料生成随堂测验</button>
+                                        <button onclick="Swal.fire('课件已优化', 'AI 已为您补充了相关的趣味图片与精准拼音标注！', 'success')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">🌟 生成优化版课件 (附拼音解释)</button>
+                                    </div>
+                                `,
+                                showConfirmButton: false, showCancelButton: true, cancelButtonText: '关闭窗口'
+                            });
+                        });
+                    });
+                }
+            });
+        };
+
         function initRadarChart() {
             const ctx = document.getElementById('radarChart'); if (!ctx) return; if (radarChartInstance) radarChartInstance.destroy(); 
             const data = { labels: ['听力', '口语', '阅读', '写作', '词汇', '语法'], datasets: [{ label: '班级平均水平', data: [85, 70, 90, 75, 88, 65], fill: true, backgroundColor: 'rgba(79, 70, 229, 0.2)', borderColor: 'rgb(79, 70, 229)', pointBackgroundColor: 'rgb(79, 70, 229)', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: 'rgb(79, 70, 229)' }] };
@@ -487,15 +572,10 @@
             const container = document.getElementById('leaderboard-container'); const teacherTable = document.getElementById('teacher-table-body');
             if(container) container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">正在拉取云端数据...</div>';
             try {
-                // 🌟 新增：数据库实时统计大盘数据 (仅教师执行)
                 if (window.selectedRole === 'teacher') {
                     const allUsersSnap = await getDocs(collection(db, "users"));
                     let total = 0, students = 0, teachers = 0;
-                    allUsersSnap.forEach(doc => {
-                        total++;
-                        if(doc.data().role === 'student') students++;
-                        else if(doc.data().role === 'teacher') teachers++;
-                    });
+                    allUsersSnap.forEach(doc => { total++; if(doc.data().role === 'student') students++; else if(doc.data().role === 'teacher') teachers++; });
                     if(document.getElementById('stat-total')) {
                         document.getElementById('stat-total').innerText = total;
                         document.getElementById('stat-students').innerText = students;
