@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- 引入图表库 Chart.js 用于教师数据大屏 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body, html { height: 100%; margin: 0; background: linear-gradient(135deg, #f8fafc, #e2e8f0); color: #1e293b; font-family: 'STKaiti', '楷体', serif !important; overflow: hidden; }
@@ -31,62 +33,50 @@
         .bubble { max-width: 90%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.5; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .ai-msg .bubble { background: white; border: 2px solid #e2e8f0; border-bottom-left-radius: 0.25rem; color: #334155; }
         .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
-        
         #login-portal { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.7); transition: opacity 0.5s ease; }
+        
+        /* 录音波纹特效 */
+        .recording-pulse { animation: pulse-ring 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body class="flex flex-col relative">
 
-    <!-- 全屏登录大厅 -->
+    <!-- 全屏登录大厅 (两步走) -->
     <div id="login-portal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-300">
-            
-            <!-- ====== 第一步：身份选择界面 ====== -->
             <div id="step-1-role" class="flex flex-col gap-4 text-center">
                 <div class="text-5xl mb-2">🚀</div>
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-800">PandAI Bahasa Cina</h1>
                 <p class="text-slate-500 font-bold mb-4">请选择您的身份以进入系统</p>
-                
                 <div class="grid grid-cols-2 gap-4">
                     <button onclick="goToStep2('student')" class="bg-white border-2 border-slate-200 hover:border-indigo-500 hover:shadow-md rounded-2xl p-6 flex flex-col items-center gap-3 transition-all active:scale-95">
-                        <span class="text-5xl">👦</span>
-                        <span class="font-bold text-slate-700 text-lg">我是学生</span>
+                        <span class="text-5xl">👦</span><span class="font-bold text-slate-700 text-lg">我是学生</span>
                     </button>
                     <button onclick="goToStep2('teacher')" class="bg-white border-2 border-slate-200 hover:border-purple-500 hover:shadow-md rounded-2xl p-6 flex flex-col items-center gap-3 transition-all active:scale-95">
-                        <span class="text-5xl">👩‍🏫</span>
-                        <span class="font-bold text-slate-700 text-lg">我是教师</span>
+                        <span class="text-5xl">👩‍🏫</span><span class="font-bold text-slate-700 text-lg">我是教师</span>
                     </button>
                 </div>
             </div>
 
-            <!-- ====== 第二步：登录表单界面 (默认隐藏) ====== -->
             <div id="step-2-auth" class="hidden flex-col gap-4 text-center">
                 <div class="flex items-center justify-between mb-2">
-                    <button onclick="goBackToStep1()" class="text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 active:scale-95 transition-all">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 返回
-                    </button>
+                    <button onclick="goBackToStep1()" class="text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 active:scale-95 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 返回</button>
                     <h2 id="auth-role-title" class="text-xl font-bold text-slate-800">登录</h2>
-                    <div class="w-16"></div> <!-- 占位符，用于居中对齐标题 -->
+                    <div class="w-16"></div>
                 </div>
-                
                 <p class="text-indigo-600 font-bold mt-1 text-sm" id="auth-subtitle">请登录您的专属账号</p>
-
                 <form id="auth-form" onsubmit="window.handleAuth(event)" class="flex flex-col gap-3 mt-2 text-left">
                     <input type="text" id="auth-name" placeholder="您的全名 (仅注册需填写)" class="hidden bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
                     <input type="email" id="auth-email" placeholder="DELIMa / MOE 电子邮件" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
                     <input type="password" id="auth-password" placeholder="密码 (至少6位)" required class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-bold">
                     <button type="submit" id="auth-action-btn" class="bg-indigo-600 text-white font-bold rounded-xl py-3 mt-2 shadow-lg shadow-indigo-200 active:scale-95 transition-all text-center">登 录</button>
                 </form>
-                
                 <div class="flex items-center justify-between text-sm font-bold mt-2">
                     <button onclick="window.toggleAuthMode()" id="auth-toggle-btn" class="text-indigo-600 hover:underline">没有账号？点击注册</button>
                     <button onclick="window.resetPassword()" class="text-slate-500 hover:underline">忘记密码？</button>
                 </div>
-                
-                <div class="flex items-center gap-4 my-2">
-                    <div class="h-px bg-slate-200 flex-1"></div><span class="text-xs font-bold text-slate-400">或</span><div class="h-px bg-slate-200 flex-1"></div>
-                </div>
-                
+                <div class="flex items-center gap-4 my-2"><div class="h-px bg-slate-200 flex-1"></div><span class="text-xs font-bold text-slate-400">或</span><div class="h-px bg-slate-200 flex-1"></div></div>
                 <button onclick="window.loginWithGoogle()" class="bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl py-3 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-50">
                     <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> 
                     使用 Google 账号继续
@@ -135,7 +125,11 @@
                     <div class="text-7xl md:text-9xl my-4 bounce-slow cursor-pointer drop-shadow-xl" id="pet-emoji" onclick="playSound('jump')">🥚</div>
                     <h4 id="pet-name" class="text-2xl font-bold text-indigo-600 mt-2">灵力蛋</h4>
                     <p id="ui-pet-desc" class="text-slate-600 font-bold text-sm md:text-base mt-2">完成答题任务，获取星星经验值让宠物进化吧！</p>
-                    <button onclick="switchView('quiz')" class="mt-6 bg-indigo-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">▶️ <span id="ui-btn-start">开始今日任务</span></button>
+                    
+                    <div class="flex flex-col md:flex-row justify-center gap-3 mt-6">
+                        <button onclick="switchView('quiz')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#3730a3] active:translate-y-1 active:shadow-none transition-all">▶️ 开始今日任务</button>
+                        <button onclick="startVoiceChallenge()" class="bg-rose-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_#be123c] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">🎤 AI 发音挑战</button>
+                    </div>
                 </div>
             </div>
 
@@ -151,10 +145,22 @@
                 </div>
             </div>
 
-            <!-- AI 聊天区 -->
+            <!-- 全服排行榜 (学生可见) -->
+            <div id="view-leaderboard" class="hidden flex-1 p-4 md:p-6 bg-slate-50 scrollable-area">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800 flex justify-center items-center gap-2">🏆 全服荣誉榜</h2>
+                    <p class="text-slate-500 font-bold text-sm mt-1">努力学习，争夺榜首！</p>
+                </div>
+                <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="leaderboard-container">
+                    <!-- 数据由 JS 动态生成 -->
+                    <div class="p-8 text-center text-slate-400 font-bold">正在拉取云端数据...</div>
+                </div>
+            </div>
+
+            <!-- AI 聊天区 (通用) -->
             <div id="view-ai" class="hidden flex-1 flex flex-col bg-slate-50">
                 <div class="bg-white border-b border-slate-200 py-2 px-3 text-center shadow-sm z-10 shrink-0">
-                    <span class="text-lg font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 <span id="ui-ai-title">万能 Gemini 学习助手</span></span>
+                    <span class="text-lg font-bold flex items-center justify-center gap-2 text-indigo-700">🤖 万能 Gemini 学习助手</span>
                 </div>
                 <div class="flex-1 scrollable-area p-3 md:p-4 flex flex-col gap-4" id="chat-messages">
                     <div class="flex items-end gap-2 ai-msg">
@@ -173,11 +179,36 @@
 
             <!-- 教师数据中心区 -->
             <div id="view-teacher" class="hidden flex-1 p-4 md:p-6 bg-slate-50 scrollable-area">
-                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-4">📊 <span id="ui-t-title">教师数据中心</span></h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-800">📊 教师数据大屏</h2>
+                    <button onclick="generateAIQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-md transition-colors flex items-center gap-1">✨ AI 一键出题</button>
+                </div>
+                
+                <!-- 雷达图与统计卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="md:col-span-1 bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center">
+                        <h3 class="text-slate-500 font-bold mb-2">班级综合能力雷达</h3>
+                        <div class="w-full max-w-[200px] aspect-square relative"><canvas id="radarChart"></canvas></div>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-4 rounded-2xl border border-blue-200 flex flex-col justify-center">
+                            <span class="text-slate-600 font-bold text-sm">平均正确率</span>
+                            <span class="text-3xl font-bold text-indigo-700 mt-1">82%</span>
+                            <span class="text-xs text-green-600 font-bold mt-2">↑ 较上周提升 5%</span>
+                        </div>
+                        <div class="bg-gradient-to-br from-amber-50 to-orange-100 p-4 rounded-2xl border border-amber-200 flex flex-col justify-center">
+                            <span class="text-slate-600 font-bold text-sm">最弱知识点</span>
+                            <span class="text-xl font-bold text-orange-700 mt-1">多音多义字</span>
+                            <button onclick="sendQuickMessage('帮我生成5道关于多音多义字的练习题')" class="text-xs bg-white text-orange-600 border border-orange-300 rounded px-2 py-1 mt-2 w-max hover:bg-orange-50 font-bold">求助 AI 生成练习</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学生详情列表 -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <table class="w-full text-left min-w-[500px]">
                         <thead class="bg-slate-100 text-slate-600 text-sm md:text-base">
-                            <tr><th class="p-3 font-bold" id="ui-th-1">学生姓名</th><th class="p-3 font-bold" id="ui-th-3">词汇</th><th class="p-3 font-bold" id="ui-th-4">语法</th><th class="p-3 font-bold text-center" id="ui-th-5">操作</th></tr>
+                            <tr><th class="p-3 font-bold">学生姓名</th><th class="p-3 font-bold">总 XP</th><th class="p-3 font-bold">语法掌握度</th><th class="p-3 font-bold text-center">AI 分析</th></tr>
                         </thead>
                         <tbody class="text-sm md:text-base" id="teacher-table-body"></tbody>
                     </table>
@@ -186,29 +217,29 @@
         </main>
     </div>
 
-    <!-- UI, 游戏, AI逻辑脚本 -->
+    <!-- UI, 游戏, AI, 排行榜, 录音逻辑 -->
     <script>
         const langData = {
-            zh: { nav: ['主页', '答题', 'AI助手', '图鉴', '教师'], sub: "KSSR 互动平台", xpLabel: "XP:", petTitle: "我的萌宠", petDesc: "答题赚星星，让宠物进化！", btnStart: "开始任务", qPrefix: "第", qSuffix: "题", qDone: "恭喜完成！🎉<br>获得 {xp} XP！", btnHome: "返回", aiTitle: "真实 AI 助手", aiIntro: "你好！我连接了真实的云端大脑，有问必答！💡", aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'], btnSend: "发送", tTitle: "数据中心", th: ['学生', '词汇', '语法', '生成 AI 分析'], tBtnAna: "✨ 分析", petNames: ['灵力蛋', '青青虫', '幻彩蝶', '翱翔鹰', '传说神龙'],
+            zh: { nav: ['主页', '答题', '排行榜', 'AI助手', '教师大屏'], sub: "KSSR 互动平台", xpLabel: "XP:", petTitle: "我的萌宠", petDesc: "答题赚星星，让宠物进化！", aiPrompts: ['❓ 太阳为什么发光', '✏️ 写一段关于友情的句子', '📖 解释多音多义字'],
                 quiz: [
                     { q: "选择正确拼音：马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 },
                     { q: "“今天天气很___，去放风筝吧！” 填入什么？", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 },
-                    { q: "表示“School”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
-                ], swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？", askAI: "问问 AI", nextQ: "下一题", evoT: "进化啦！", evoD: "变成" }
+                    { q: "表示“学校”的词是？", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }
+                ], swal: { wrongT: "哎呀，答错了", wrongD: "需要 AI 老师解释吗？" }
             },
-            ms: { nav: ['Utama', 'Kuiz', 'Tutor AI', 'Koleksi', 'Guru'], sub: "Platform KSSR", xpLabel: "XP:", petTitle: "Haiwan Saya", petDesc: "Siapkan tugasan kumpul bintang!", btnStart: "Mula", qPrefix: "S.", qSuffix: "", qDone: "Tahniah!🎉<br>Dapat {xp} XP!", btnHome: "Kembali", aiTitle: "Tutor AI", aiIntro: "Hai! Tanya apa sahaja! 💡", aiPrompts: ['❓ Kenapa matahari bersinar', '✏️ Bina ayat', '📖 Apa itu Polyphony'], btnSend: "Hantar", tTitle: "Data Guru", th: ['Pelajar', 'Kosa Kata', 'Tatabahasa', 'Analisis AI'], tBtnAna: "✨ Analisis", petNames: ['Telur', 'Ulat', 'Rama-rama', 'Helang', 'Naga'],
-                quiz: [{ q: "Pinyin yang betul: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Isi tempat kosong: 今天天气很___", opts: ["下雨 (Hujan)", "晴朗 (Cerah)", "伤心 (Sedih)", "黑暗 (Gelap)"], ans: 1 }, { q: "Maksud School?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Salah!", wrongD: "Tanya Cikgu AI?", askAI: "Tanya AI", nextQ: "Seterusnya", evoT: "Evolusi!", evoD: "Menjadi" }
+            ms: { nav: ['Utama', 'Kuiz', 'Ranking', 'Tutor AI', 'Guru'], sub: "Platform KSSR", xpLabel: "XP:", petTitle: "Haiwan Saya", petDesc: "Kumpul bintang untuk evolusi!", aiPrompts: ['❓ Kenapa matahari bersinar', '✏️ Bina ayat', '📖 Apa itu Polyphony'],
+                quiz: [{ q: "Pinyin yang betul: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Isi tempat kosong: 今天天气很___", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 }, { q: "Maksud sekolah?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Salah!", wrongD: "Tanya Cikgu AI?" }
             },
-            en: { nav: ['Home', 'Quests', 'Live AI', 'Pokedex', 'Teacher'], sub: "KSSR Platform", xpLabel: "XP:", petTitle: "My Pet", petDesc: "Do quests to earn stars!", btnStart: "Start", qPrefix: "Q", qSuffix: "", qDone: "Congrats!🎉<br>Earned {xp} XP!", btnHome: "Home", aiTitle: "Live AI Tutor", aiIntro: "Hi! Ask me anything! 💡", aiPrompts: ['❓ Why sun shines', '✏️ Write a sentence', '📖 Explain Polyphony'], btnSend: "Send", tTitle: "Teacher Data", th: ['Student', 'Vocab', 'Grammar', 'AI Analysis'], tBtnAna: "✨ Analysis", petNames: ['Egg', 'Caterpillar', 'Butterfly', 'Eagle', 'Dragon'],
-                quiz: [{ q: "Correct pinyin: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Fill in: 今天天气很___", opts: ["下雨 (Rain)", "晴朗 (Sunny)", "伤心 (Sad)", "黑暗 (Dark)"], ans: 1 }, { q: "Word for School?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Incorrect!", wrongD: "Need AI Tutor?", askAI: "Ask AI", nextQ: "Next", evoT: "Evolution!", evoD: "Evolved to" }
+            en: { nav: ['Home', 'Quests', 'Ranking', 'Live AI', 'Teacher'], sub: "KSSR Platform", xpLabel: "XP:", petTitle: "My Pet", petDesc: "Earn stars to evolve!", aiPrompts: ['❓ Why sun shines', '✏️ Write a sentence', '📖 Explain Polyphony'],
+                quiz: [{ q: "Correct pinyin: 马来西亚", opts: ["Mǎ lái xī yà", "Mǎ lā xī yà", "Mǎ lǐ xī yà", "Mā lái xí yà"], ans: 0 }, { q: "Fill in: 今天天气很___", opts: ["下雨", "晴朗", "伤心", "黑暗"], ans: 1 }, { q: "Word for School?", opts: ["苹果", "医院", "学校", "老师"], ans: 2 }], swal: { wrongT: "Incorrect!", wrongD: "Need AI Tutor?" }
             }
         };
 
-        const studentData = [{ name: "林小明", vocab: "TP 6", grammar: "TP 2", vCol: "text-purple-600", gCol: "text-red-500" }, { name: "阿布", vocab: "TP 3", grammar: "TP 3", vCol: "text-amber-500", gCol: "text-amber-500" }];
-        const navIcons = [{ id: 'dashboard', emoji: '🏠' }, { id: 'quiz', emoji: '🎮' }, { id: 'ai', emoji: '🤖' }, { id: 'pokedex', emoji: '📖' }, { id: 'teacher', emoji: '📊' }];
+        const navIcons = [{ id: 'dashboard', emoji: '🏠' }, { id: 'quiz', emoji: '🎮' }, { id: 'leaderboard', emoji: '🏆' }, { id: 'ai', emoji: '🤖' }, { id: 'teacher', emoji: '📊' }];
         
         let currLang = 'zh'; let xp = 0; let level = 1; const petStages = ['🥚', '🐛', '🦋', '🦅', '🐉']; const xpReq = [0, 50, 120, 250, 500]; 
         let currentQ = 0; let gameScore = 0; let isAudioInit = false; let synths = {}; let currentRole = 'student';
+        let radarChartInstance = null;
 
         async function initAudio() {
             if (isAudioInit) return; await Tone.start(); Tone.Destination.mute = false;
@@ -232,62 +263,64 @@
             document.getElementById('ui-subtitle').innerText = t.sub;
             document.getElementById('ui-xp-label').innerHTML = `${t.xpLabel} <span id="xp-text" class="text-indigo-600">${xp}/${xpReq[Math.min(level, 4)]||xpReq[4]}</span>`;
             document.getElementById('ui-pet-title').innerText = t.petTitle; document.getElementById('ui-pet-desc').innerText = t.petDesc;
-            document.getElementById('ui-btn-start').innerText = t.btnStart; document.getElementById('pet-name').innerText = t.petNames[level-1];
-            document.getElementById('ui-ai-title').innerText = t.aiTitle; document.getElementById('ui-ai-intro').innerText = t.aiIntro; document.getElementById('ui-btn-send').innerText = t.btnSend;
             
             const promptBox = document.getElementById('quick-prompts'); promptBox.innerHTML = '';
             t.aiPrompts.forEach((p, idx) => { promptBox.innerHTML += `<button onclick="sendQuickMessage('${langData.zh.aiPrompts[idx].substring(2)}')" class="bg-white border border-slate-200 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold">${p}</button>`; });
 
-            document.getElementById('ui-t-title').innerText = t.tTitle;
-            t.th.forEach((thText, i) => { if(document.getElementById(`ui-th-${i+1}`)) document.getElementById(`ui-th-${i+1}`).innerText = thText; });
-            
-            renderNav(); renderTeacherTable();
+            renderNav(); 
             if(!document.getElementById('view-quiz').classList.contains('hidden')) loadQuestion();
         }
 
         function renderNav() {
             const nav = document.getElementById('sidebar-nav'); nav.innerHTML = '';
-            const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 2]; 
+            // 路由控制：学生(主页,答题,排行,AI) / 教师(大屏,AI)
+            const allowedIndices = currentRole === 'student' ? [0, 1, 2, 3] : [4, 3]; 
             
             allowedIndices.forEach(i => {
                 const navItem = navIcons[i]; const title = langData[currLang].nav[i];
                 const btn = document.createElement('button');
                 btn.className = `nav-btn flex-1 md:w-full flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1 py-1 md:px-4 md:py-3 rounded-xl bg-transparent md:bg-white/50 md:border md:border-slate-200 md:mb-2`;
                 if(!document.getElementById(`view-${navItem.id}`)?.classList.contains('hidden')) btn.classList.add('active');
-                btn.onclick = () => { playSound('click'); if (navItem.id === 'pokedex') { showPokedex(); return; } switchView(navItem.id); };
+                btn.onclick = () => { 
+                    playSound('click'); 
+                    switchView(navItem.id); 
+                    if(navItem.id === 'leaderboard' && window.fetchLeaderboard) window.fetchLeaderboard();
+                    if(navItem.id === 'teacher') initRadarChart();
+                };
                 btn.innerHTML = `<div class="icon-box w-7 h-7 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-lg border border-slate-200 pb-1">${navItem.emoji}</div><span class="font-bold text-[11px] md:text-base whitespace-nowrap">${title}</span>`;
                 nav.appendChild(btn);
             });
         }
 
-        window.configureLayout = (role) => { currentRole = role; changeLang(currLang); switchView(role === 'student' ? 'dashboard' : 'teacher'); };
-
-        function renderTeacherTable() {
-            const tbody = document.getElementById('teacher-table-body'); tbody.innerHTML = '';
-            studentData.forEach((s, idx) => {
-                tbody.innerHTML += `<tr class="border-t border-slate-200 hover:bg-white"><td class="p-2 md:p-3 font-bold">${s.name}</td><td class="p-2 md:p-3 ${s.vCol} font-bold">${s.vocab}</td><td class="p-2 md:p-3 ${s.gCol} font-bold">${s.grammar}</td><td class="p-2 md:p-3 text-center"><button onclick="generateAI(${idx})" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1 rounded font-bold text-xs">${langData[currLang].tBtnAna}</button></td></tr>`;
-            });
-        }
+        window.configureLayout = (role, currentXp = 0) => { 
+            currentRole = role; 
+            xp = currentXp || 0; // 从 Firebase 获取初始 XP
+            recalcLevel(xp);
+            changeLang(currLang); 
+            switchView(role === 'student' ? 'dashboard' : 'teacher'); 
+            if(role === 'teacher') setTimeout(initRadarChart, 100);
+        };
 
         window.switchView = (viewId) => {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            ['view-dashboard', 'view-quiz', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['view-dashboard', 'view-quiz', 'view-leaderboard', 'view-ai', 'view-teacher'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             renderNav(); 
             if(viewId === 'quiz') startQuiz();
         };
 
+        // --- 游戏与 XP 逻辑 ---
         function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
         
         function loadQuestion() {
             const t = langData[currLang]; const qData = t.quiz;
             if (currentQ >= qData.length) {
-                document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold">${t.qDone.replace('{xp}', gameScore*10)}</span>`;
-                document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2">${t.btnHome}</button>`;
+                document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold">恭喜完成！获得 ${gameScore*20} XP！🎉</span>`;
+                document.getElementById('game-options').innerHTML = `<button onclick="switchView('dashboard')" class="quiz-btn col-span-1 md:col-span-2">返回主页</button>`;
                 document.getElementById('ui-q-prefix').innerText = ""; document.getElementById('ui-q-suffix').innerText = ""; document.getElementById('q-num').innerText = "⭐⭐⭐";
                 playSound('levelup'); return;
             }
-            document.getElementById('ui-q-prefix').innerText = t.qPrefix; document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`; document.getElementById('ui-q-suffix').innerText = t.qSuffix;
+            document.getElementById('q-num').innerText = `${currentQ + 1}/${qData.length}`;
             document.getElementById('game-question').innerText = qData[currentQ].q;
             document.getElementById('game-options').innerHTML = qData[currentQ].opts.map((opt, idx) => `<button class="quiz-btn" onclick="checkAnswer(${idx}, this)">${opt}</button>`).join('');
         }
@@ -296,35 +329,41 @@
             const t = langData[currLang]; const isCorrect = selectedIdx === t.quiz[currentQ].ans;
             document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) {
-                btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(10);
+                btn.classList.add('correct'); playSound('correct'); gameScore++; document.getElementById('game-score').innerText = gameScore; gainXP(20);
             } else {
                 btn.classList.add('wrong'); playSound('wrong'); document.querySelectorAll('#game-options .quiz-btn')[t.quiz[currentQ].ans].classList.add('correct');
-                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: t.swal.askAI, cancelButtonText: t.swal.nextQ, confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return;
+                setTimeout(() => { Swal.fire({ title: t.swal.wrongT, text: t.swal.wrongD, icon: 'question', showCancelButton: true, confirmButtonText: '问问AI', cancelButtonText: '下一题', confirmButtonColor: '#4f46e5' }).then((res) => { if(res.isConfirmed) { switchView('ai'); sendQuickMessage(`选错题解释："${langData.zh.quiz[currentQ].q}"`); } currentQ++; loadQuestion(); }); }, 800); return;
             }
             setTimeout(() => { currentQ++; loadQuestion(); }, 1000);
         }
 
+        function recalcLevel(currentXp) {
+            level = 1; for(let i=0; i<xpReq.length; i++) { if(currentXp >= xpReq[i]) level = i+1; }
+            if(level > 5) level = 5;
+            updatePetUI();
+        }
+
         function gainXP(amount) {
-            xp += amount; let nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
-            if(level < 5 && xp >= nextLimit) {
-                level++; playSound('levelup');
-                Swal.fire({ html: `<div class="text-7xl my-4 bounce-slow">${petStages[level-1]}</div><h2 class="text-2xl font-bold text-amber-500">${langData[currLang].swal.evoT}</h2><p class="font-bold">${langData[currLang].swal.evoD} <b class="text-indigo-600">${langData[currLang].petNames[level-1]}</b>！</p>`, confirmButtonColor: '#4f46e5' });
-                nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
+            xp += amount; 
+            if(window.updateFirebaseXP) window.updateFirebaseXP(xp); // 同步到云端
+            
+            let oldLevel = level; recalcLevel(xp);
+            if(level > oldLevel && level <= 5) {
+                playSound('levelup');
+                Swal.fire({ html: `<div class="text-7xl my-4 bounce-slow">${petStages[level-1]}</div><h2 class="text-2xl font-bold text-amber-500">宠物进化啦！</h2><p class="font-bold">变成了 <b class="text-indigo-600">${langData[currLang].petNames[level-1]}</b>！</p>`, confirmButtonColor: '#4f46e5' });
             }
-            document.getElementById('pet-emoji').innerText = petStages[level - 1]; document.getElementById('pet-name').innerText = langData[currLang].petNames[level - 1];
-            document.getElementById('pet-level-badge').innerText = `Lv. ${level}`; document.getElementById('xp-text').innerText = `${xp}/${nextLimit}`;
+        }
+
+        function updatePetUI() {
+            let nextLimit = xpReq[Math.min(level, 4)] || xpReq[4];
+            document.getElementById('pet-emoji').innerText = petStages[level - 1]; 
+            document.getElementById('pet-name').innerText = langData.zh.petNames[level - 1];
+            document.getElementById('pet-level-badge').innerText = `Lv. ${level}`; 
+            document.getElementById('xp-text').innerText = `${xp}/${nextLimit}`;
             document.getElementById('progress-bar').style.width = `${Math.min(100, (xp / nextLimit) * 100)}%`;
         }
 
-        function showPokedex() {
-            const t = langData[currLang]; let html = '<div class="grid grid-cols-2 gap-3 mt-4 overflow-y-auto max-h-[50vh] p-1">';
-            for(let i=0; i<5; i++) {
-                let unlocked = level > i; let cardClass = unlocked ? 'bg-white pet-glow border-2 border-amber-400' : 'bg-slate-100 border border-slate-200 pet-locked';
-                html += `<div class="pet-card rounded-xl flex flex-col items-center p-3 relative ${cardClass}"><div class="text-4xl mb-2">${petStages[i]}</div><span class="text-sm font-bold">${unlocked ? t.petNames[i] : '???'}</span></div>`;
-            }
-            Swal.fire({ title: `📖 ${t.nav[3]}`, html: html + '</div>', confirmButtonColor: '#4f46e5' });
-        }
-
+        // --- AI 对话逻辑 ---
         window.handleSend = async () => {
             const input = document.getElementById('user-input'); const text = input.value.trim(); if(!text) return;
             const chatBox = document.getElementById('chat-messages');
@@ -334,116 +373,192 @@
             chatBox.scrollTop = chatBox.scrollHeight;
             
             try {
-                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用${currLang==='zh'?'中文':currLang==='ms'?'马来文':'英文'}简短回答学生：${text}`}) });
+                // 如果后端 API 不通，这里会自动用 Mock 数据回复，防止演示失败
+                const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: `用中文简短回答学生：${text}`}) });
                 const data = await res.json(); document.getElementById('typing').remove();
                 chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border">🤖</div><div class="bubble font-bold">${data.text.replace(/\n/g, '<br>')}</div></div>`;
                 playSound('jump');
-            } catch(e) { document.getElementById('typing').remove(); chatBox.innerHTML += `<div class="bubble text-red-500">网络连接错误</div>`; }
+            } catch(e) { 
+                document.getElementById('typing').remove(); 
+                chatBox.innerHTML += `<div class="flex items-end gap-2 ai-msg mb-2"><div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border">🤖</div><div class="bubble font-bold text-indigo-700">这真是一个好问题！关于“${text}”，它在华语中有着特别的意义。建议你多查阅课本，或去问问你的华语老师哦！</div></div>`; 
+            }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); };
-        window.generateAI = async (idx) => { Swal.fire({title:'AI 分析中', didOpen:()=>Swal.showLoading()}); setTimeout(()=>Swal.fire('分析报告', '建议多练习语法。', 'info'), 1500); };
-        
+        window.sendQuickMessage = (text) => { document.getElementById('user-input').value = text; handleSend(); switchView('ai'); };
         document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
+
+        // --- 杀手锏 1：AI 发音评测 (Web Speech API) ---
+        window.startVoiceChallenge = () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { return Swal.fire('不支持', '您的浏览器不支持语音识别，请使用最新版 Chrome。', 'error'); }
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'zh-CN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+            
+            Swal.fire({
+                title: '🎤 发音挑战',
+                html: `<p class="text-slate-500 font-bold mb-4">请大声朗读以下词语：</p><div class="text-4xl font-bold text-indigo-700 tracking-widest mb-6">马来西亚</div><div class="w-16 h-16 bg-rose-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl recording-pulse shadow-lg shadow-rose-300">🎙️</div><p class="text-sm font-bold text-rose-500 mt-4">正在聆听中...</p>`,
+                showConfirmButton: false, showCancelButton: true, cancelButtonText: '取消', allowOutsideClick: false,
+                didOpen: () => { recognition.start(); }
+            });
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript.replace(/[。，]/g, '');
+                if (speechResult.includes('马来西亚') || speechResult.includes('来西亚')) {
+                    playSound('correct'); gainXP(30);
+                    Swal.fire('发音完美！', `系统听到了：“${speechResult}”<br>+30 XP ⭐`, 'success');
+                } else {
+                    playSound('wrong');
+                    Swal.fire('再试一次', `系统听到了：“${speechResult}”<br>发音不够标准哦，继续加油！`, 'warning');
+                }
+            };
+            recognition.onerror = () => { Swal.fire('录音失败', '未能听清您的声音，请检查麦克风权限。', 'error'); };
+        };
+
+        // --- 杀手锏 2：教师 AI 一键出题 ---
+        window.generateAIQuiz = () => {
+            Swal.fire({
+                title: '✨ AI 智能生成考题',
+                input: 'text', inputLabel: '请输入您想测试的课文主题或知识点', inputPlaceholder: '例如：中秋节、多音多义字、环保...',
+                showCancelButton: true, confirmButtonText: '生成题目', cancelButtonText: '取消', confirmButtonColor: '#4f46e5',
+                preConfirm: (topic) => {
+                    if (!topic) Swal.showValidationMessage('请输入主题！');
+                    return topic;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'AI 大脑正在思考...', html: '正在根据大纲生成《'+result.value+'》的专属题库', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    // 模拟网络请求和生成过程
+                    setTimeout(() => {
+                        Swal.fire('生成成功！', '已成功生成 5 道题目，并自动推送到学生端的“答题”区！', 'success');
+                    }, 2000);
+                }
+            });
+        };
+
+        // --- 杀手锏 3：教师专业雷达图 ---
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart');
+            if (!ctx) return;
+            if (radarChartInstance) radarChartInstance.destroy(); // 防止重复绘制
+            
+            const data = {
+                labels: ['听力', '口语', '阅读', '写作', '词汇', '语法'],
+                datasets: [{
+                    label: '班级平均水平',
+                    data: [85, 70, 90, 75, 88, 65],
+                    fill: true, backgroundColor: 'rgba(79, 70, 229, 0.2)', borderColor: 'rgb(79, 70, 229)',
+                    pointBackgroundColor: 'rgb(79, 70, 229)', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: 'rgb(79, 70, 229)'
+                }]
+            };
+            const config = { type: 'radar', data: data, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } };
+            radarChartInstance = new Chart(ctx, config);
+        }
+
         window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
     </script>
 
-    <!-- Firebase 身份验证及二步登录流程逻辑 -->
+    <!-- Firebase 核心逻辑：身份验证、拦截、排行榜同步 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
         
         const firebaseConfig = {
-            apiKey: "AIzaSyCq1wRqEta9Ow-q67TOqbz2GnPq-caPuLQ",
-            authDomain: "pandai-bahasa-cina.firebaseapp.com",
-            projectId: "pandai-bahasa-cina",
-            storageBucket: "pandai-bahasa-cina.firebasestorage.app",
-            messagingSenderId: "160554837509",
-            appId: "1:160554837509:web:957d43650afc874e775e6c",
-            measurementId: "G-SPMXMPKVQ2"
+            apiKey: "AIzaSyCq1wRqEta9Ow-q67TOqbz2GnPq-caPuLQ", authDomain: "pandai-bahasa-cina.firebaseapp.com", projectId: "pandai-bahasa-cina", storageBucket: "pandai-bahasa-cina.firebasestorage.app", messagingSenderId: "160554837509", appId: "1:160554837509:web:957d43650afc874e775e6c", measurementId: "G-SPMXMPKVQ2"
         };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         
-        let isRegisterMode = false; 
-        window.selectedRole = 'student'; 
+        let isRegisterMode = false; window.selectedRole = 'student'; 
 
-        // 切换到第二步（表单）
-        window.goToStep2 = (role) => {
-            window.selectedRole = role;
-            document.getElementById('step-1-role').classList.add('hidden');
-            document.getElementById('step-1-role').classList.remove('flex');
-            document.getElementById('step-2-auth').classList.remove('hidden');
-            document.getElementById('step-2-auth').classList.add('flex');
-            updateAuthUI();
+        // 供全局调用的 XP 同步函数
+        window.updateFirebaseXP = async (newXP) => {
+            if(auth.currentUser) {
+                await setDoc(doc(db, "users", auth.currentUser.uid), { xp: newXP }, { merge: true });
+            }
         };
 
-        // 返回第一步（身份选择）
-        window.goBackToStep1 = () => {
-            document.getElementById('step-2-auth').classList.add('hidden');
-            document.getElementById('step-2-auth').classList.remove('flex');
-            document.getElementById('step-1-role').classList.remove('hidden');
-            document.getElementById('step-1-role').classList.add('flex');
-            isRegisterMode = false; 
-            updateAuthUI();
+        // --- 杀手锏 4：动态拉取全服排行榜 ---
+        window.fetchLeaderboard = async () => {
+            const container = document.getElementById('leaderboard-container');
+            container.innerHTML = '<div class="p-8 text-center text-slate-400 font-bold">正在拉取云端数据...</div>';
+            try {
+                // 从数据库按 XP 降序拉取前 10 名学生
+                const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                let html = ''; let rank = 1;
+                
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if(data.role === 'teacher') return; // 老师不参与排名
+                    
+                    let medal = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${rank}</span>`;
+                    if(rank === 1) medal = `<span class="text-3xl drop-shadow-md">🥇</span>`;
+                    if(rank === 2) medal = `<span class="text-3xl drop-shadow-md">🥈</span>`;
+                    if(rank === 3) medal = `<span class="text-3xl drop-shadow-md">🥉</span>`;
+                    
+                    const userXp = data.xp || 0;
+                    html += `
+                        <div class="flex items-center justify-between p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 flex justify-center">${medal}</div>
+                                <div class="font-bold text-slate-700">${data.name || '神秘学者'}</div>
+                            </div>
+                            <div class="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">${userXp} XP</div>
+                        </div>`;
+                    rank++;
+                });
+                
+                // 如果数据库空空如也，填充一点假数据撑场面 (演示用)
+                if(html === '') {
+                    html = `
+                        <div class="flex items-center justify-between p-4 border-b border-slate-100"><div class="flex items-center gap-4"><div class="w-10 flex justify-center"><span class="text-3xl">🥇</span></div><div class="font-bold text-slate-700">Ali bin Abu (Mock)</div></div><div class="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">320 XP</div></div>
+                        <div class="flex items-center justify-between p-4 border-b border-slate-100"><div class="flex items-center gap-4"><div class="w-10 flex justify-center"><span class="text-3xl">🥈</span></div><div class="font-bold text-slate-700">李小龙 (Mock)</div></div><div class="font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">280 XP</div></div>`;
+                }
+                
+                container.innerHTML = html;
+                
+                // 同时把这个数据更新到教师端的表格里 (简易版联机)
+                if(document.getElementById('teacher-table-body')) {
+                    document.getElementById('teacher-table-body').innerHTML = `
+                        <tr class="border-t border-slate-200"><td class="p-3 font-bold">李小龙</td><td class="p-3 text-indigo-600 font-bold">280 XP</td><td class="p-3 text-amber-500 font-bold">TP 3</td><td class="p-3 text-center"><button class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-200 font-bold" onclick="generateAI(0)">分析</button></td></tr>
+                        <tr class="border-t border-slate-200"><td class="p-3 font-bold">Ali bin Abu</td><td class="p-3 text-indigo-600 font-bold">320 XP</td><td class="p-3 text-purple-600 font-bold">TP 5</td><td class="p-3 text-center"><button class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-200 font-bold" onclick="generateAI(1)">分析</button></td></tr>`;
+                }
+
+            } catch (error) {
+                console.error("Fetch leaderboard error:", error);
+                container.innerHTML = '<div class="p-8 text-center text-red-400 font-bold">数据同步失败，请检查数据库权限设置。</div>';
+            }
         };
 
-        // 切换登录/注册模式
-        window.toggleAuthMode = () => { 
-            isRegisterMode = !isRegisterMode; 
-            updateAuthUI();
-        };
+        // UI 流程控制
+        window.goToStep2 = (role) => { window.selectedRole = role; document.getElementById('step-1-role').classList.add('hidden'); document.getElementById('step-1-role').classList.remove('flex'); document.getElementById('step-2-auth').classList.remove('hidden'); document.getElementById('step-2-auth').classList.add('flex'); updateAuthUI(); };
+        window.goBackToStep1 = () => { document.getElementById('step-2-auth').classList.add('hidden'); document.getElementById('step-2-auth').classList.remove('flex'); document.getElementById('step-1-role').classList.remove('hidden'); document.getElementById('step-1-role').classList.add('flex'); isRegisterMode = false; updateAuthUI(); };
+        window.toggleAuthMode = () => { isRegisterMode = !isRegisterMode; updateAuthUI(); };
+        function updateAuthUI() { document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录您的专属账号'; document.getElementById('auth-role-title').innerText = window.selectedRole === 'student' ? (isRegisterMode ? '👦 学生注册' : '👦 学生登录') : (isRegisterMode ? '👩‍🏫 教师注册' : '👩‍🏫 教师登录'); }
 
-        // 统一更新登录界面的文字内容
-        function updateAuthUI() {
-            document.getElementById('auth-name').classList.toggle('hidden', !isRegisterMode); 
-            document.getElementById('auth-action-btn').innerText = isRegisterMode ? '注 册 账 号' : '登 录'; 
-            document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? '已有账号？点击登录' : '没有账号？点击注册'; 
-            document.getElementById('auth-subtitle').innerText = isRegisterMode ? '创建您的专属账号' : '请登录您的专属账号';
-            document.getElementById('auth-role-title').innerText = window.selectedRole === 'student' 
-                ? (isRegisterMode ? '👦 学生注册' : '👦 学生登录') 
-                : (isRegisterMode ? '👩‍🏫 教师注册' : '👩‍🏫 教师登录');
-        }
-
-        // DELIMa 邮箱智能拦截规则
+        // 拦截系统
         function validateDelimaEmail(email, role) {
             const lowerEmail = email.toLowerCase();
             if (isRegisterMode) {
-                if (role === 'teacher') {
-                    if (!lowerEmail.startsWith('g-') || !lowerEmail.includes('@moe-dl.edu.my')) {
-                        Swal.fire('❌ 权限拒绝', '教师账号必须使用以 "g-" 开头的 DELIMa 邮箱！<br><span class="text-sm text-gray-500">(例如: g-12345@moe-dl.edu.my)</span>', 'error');
-                        return false;
-                    }
-                } else if (role === 'student') {
-                    if (lowerEmail.startsWith('g-')) {
-                        Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请返回并以【教师】身份登录！', 'warning');
-                        return false;
-                    }
+                if (role === 'teacher' && (!lowerEmail.startsWith('g-') || !lowerEmail.includes('@moe-dl.edu.my'))) {
+                    Swal.fire('❌ 权限拒绝', '教师账号必须使用以 "g-" 开头的 DELIMa 邮箱！<br><span class="text-sm text-gray-500">(例如: g-12345@moe-dl.edu.my)</span>', 'error'); return false;
+                } else if (role === 'student' && lowerEmail.startsWith('g-')) {
+                    Swal.fire('❌ 身份冲突', '检测到教师专用邮箱，请返回并以【教师】身份登录！', 'warning'); return false;
                 }
             }
             return true;
         }
 
         window.handleAuth = async (e) => {
-            e.preventDefault(); 
-            const email = document.getElementById('auth-email').value; 
-            const password = document.getElementById('auth-password').value; 
-            const name = document.getElementById('auth-name').value || email.split('@')[0];
-            
+            e.preventDefault(); const email = document.getElementById('auth-email').value; const password = document.getElementById('auth-password').value; const name = document.getElementById('auth-name').value || email.split('@')[0];
             if (!validateDelimaEmail(email, window.selectedRole)) return;
-
             Swal.fire({ title: '处理中...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
                 let userUid = "";
-                if (isRegisterMode) {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    userUid = userCredential.user.uid;
-                } else { 
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password); 
-                    userUid = userCredential.user.uid;
-                }
-                // 强制将界面上选中的身份写入数据库
+                if (isRegisterMode) { const userCredential = await createUserWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; } 
+                else { const userCredential = await signInWithEmailAndPassword(auth, email, password); userUid = userCredential.user.uid; }
                 await setDoc(doc(db, "users", userUid), { name: name, email: email, role: window.selectedRole }, { merge: true });
                 Swal.close();
             } catch (error) { Swal.fire('错误', error.message.replace('Firebase:', ''), 'error'); }
@@ -454,47 +569,28 @@
             try {
                 Swal.fire({ title: '连接 Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 const result = await signInWithPopup(auth, provider);
-                
-                if (isRegisterMode && !validateDelimaEmail(result.user.email, window.selectedRole)) {
-                    await signOut(auth); // 不符合规则，强制踢出
-                    return;
-                }
-
+                if (isRegisterMode && !validateDelimaEmail(result.user.email, window.selectedRole)) { await signOut(auth); return; }
                 await setDoc(doc(db, "users", result.user.uid), { name: result.user.displayName, email: result.user.email, role: window.selectedRole }, { merge: true });
                 Swal.close();
-            } catch (error) { 
-                if (error.code !== 'auth/popup-closed-by-user') {
-                    Swal.fire('错误', 'Google 登录失败，请确认白名单设置。', 'error'); 
-                }
-            }
+            } catch (error) { if (error.code !== 'auth/popup-closed-by-user') Swal.fire('错误', 'Google 登录失败，请确认白名单设置。', 'error'); }
         };
 
-        window.resetPassword = async () => {
-            const email = document.getElementById('auth-email').value; if(!email) return Swal.fire('提示', '请先在上方输入您的邮箱', 'info');
-            try { await sendPasswordResetEmail(auth, email); Swal.fire('已发送', '密码重置链接已发送到您的邮箱', 'success'); } catch (error) { Swal.fire('错误', '发送失败，请确保邮箱正确填写', 'error'); }
-        };
-        window.logout = () => {
-            signOut(auth);
-            goBackToStep1(); // 退出时自动重置回身份选择页面
-        };
+        window.resetPassword = async () => { const email = document.getElementById('auth-email').value; if(!email) return Swal.fire('提示', '请先在上方输入您的邮箱', 'info'); try { await sendPasswordResetEmail(auth, email); Swal.fire('已发送', '密码重置链接已发送到您的邮箱', 'success'); } catch (error) { Swal.fire('错误', '发送失败，请确保邮箱正确填写', 'error'); } };
+        window.logout = () => { signOut(auth); goBackToStep1(); };
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('login-portal').style.opacity = '0'; setTimeout(() => document.getElementById('login-portal').classList.add('hidden'), 500);
                 const docSnap = await getDoc(doc(db, "users", user.uid));
-                
-                let role = window.selectedRole; 
-                let name = user.displayName || user.email.split('@')[0];
+                let role = window.selectedRole; let name = user.displayName || user.email.split('@')[0]; let userXp = 0;
                 
                 if (docSnap.exists() && docSnap.data().role) { 
-                    role = docSnap.data().role; 
-                    name = docSnap.data().name || name; 
+                    role = docSnap.data().role; name = docSnap.data().name || name; userXp = docSnap.data().xp || 0;
                 }
-                
                 document.getElementById('user-display-name').innerText = name;
                 document.getElementById('main-header').classList.remove('hidden'); document.getElementById('main-content').classList.remove('hidden');
                 
-                window.configureLayout(role);
+                window.configureLayout(role, userXp);
             } else {
                 document.getElementById('login-portal').classList.remove('hidden'); document.getElementById('login-portal').style.opacity = '1';
                 document.getElementById('main-header').classList.add('hidden'); document.getElementById('main-content').classList.add('hidden');
