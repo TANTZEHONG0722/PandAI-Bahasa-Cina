@@ -17,7 +17,6 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 4px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         
         .glass-panel { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); }
-        
         .nav-btn { transition: all 0.3s; border: 2px solid transparent; }
         .nav-btn.active { background: linear-gradient(135deg, rgba(79, 70, 229, 0.85), rgba(124, 58, 237, 0.85)); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.3); }
         .icon-box { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(241,245,249,0.8)); box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s;}
@@ -476,72 +475,95 @@
             recognition.onerror = () => { Swal.fire('录音失败', '未能听清您的声音，请检查麦克风权限。', 'error'); };
         };
 
-        // --- 🌟 绝杀功能 1：教师 AI 一键出题 (带预览和拦截) ---
+        // --- 🌟 真正调动 AI 的一键出题与预览修改机制 ---
         window.generateAIQuiz = () => { 
             Swal.fire({ 
                 title: '✨ AI 智能一键出题', 
                 input: 'text', 
                 inputLabel: '请输入您想测试的课文主题或知识点', 
                 inputPlaceholder: '例如：中秋节、多音多义字、环保...', 
-                showCancelButton: true, confirmButtonText: '生成预览', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', 
+                showCancelButton: true, confirmButtonText: '生成题目', cancelButtonText: '取消', confirmButtonColor: '#4f46e5', 
                 preConfirm: (topic) => { if (!topic) Swal.showValidationMessage('请输入主题！'); return topic; } 
-            }).then((result) => { 
+            }).then(async (result) => { 
                 if (result.isConfirmed) { 
-                    Swal.fire({ title: 'AI 正在编写题目...', html: '正在融合 KSSR 最新大纲进行生成', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
-                    setTimeout(() => { 
-                        Swal.fire({
-                            title: '📝 题目预览与编辑',
-                            html: `
-                                <div class="text-left text-sm space-y-3 mt-4 max-h-60 overflow-y-auto p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-100">
-                                        <div class="font-bold text-slate-800">1. "${result.value}" 相关的正确拼音是？</div>
-                                        <div class="text-slate-600 ml-4 mt-2 flex gap-4"><span class="bg-indigo-50 px-2 rounded">A) 选项一</span> <span>B) 选项二</span> <span>C) 选项三</span></div>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-100">
-                                        <div class="font-bold text-slate-800">2. 下列哪个句子正确使用了相关词语？</div>
-                                        <div class="text-slate-600 ml-4 mt-2 flex gap-4"><span>A) 句子一</span> <span class="bg-indigo-50 px-2 rounded">B) 句子二</span> <span>C) 句子三</span></div>
-                                    </div>
-                                    <div class="text-xs text-slate-400 text-center mt-3">* 老师，您可以直接在这里点击修改题目和选项。</div>
-                                </div>
-                            `,
-                            showCancelButton: true,
-                            confirmButtonText: '✅ 确认无误，下发给全班',
-                            cancelButtonText: '重新生成',
-                            confirmButtonColor: '#10b981',
-                            width: '600px'
-                        }).then((reviewRes) => {
-                            if (reviewRes.isConfirmed) {
-                                Swal.fire('发布成功！', '题目已实时推送到全班学生的手机终端，学生完成将获得奖励！', 'success'); 
-                            } else if (reviewRes.dismiss === Swal.DismissReason.cancel) {
-                                window.generateAIQuiz(); // 用户点击重新生成
-                            }
-                        });
-                    }, 2000); 
+                    const topic = result.value;
+                    Swal.fire({ title: 'AI 正在思考...', html: `正在为您生成关于《${topic}》的专属题目`, allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
+                    
+                    try {
+                        const prompt = `帮我生成2道关于"${topic}"的小学华文单选题。直接输出题目和A,B,C选项内容即可，不要任何多余的开头或结尾。`;
+                        const res = await fetch('/api/gemini', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: prompt}) }); 
+                        const data = await res.json();
+                        const aiQuestions = data.text.replace(/\n/g, '<br>');
+                        showQuizPreview(topic, aiQuestions);
+                    } catch(e) {
+                        const mockQ = `1. 关于“${topic}”，以下哪项是正确的？<br>A) 非常重要<br>B) 完全无关<br>C) 不清楚<br><br>2. 我们应该如何对待“${topic}”？<br>A) 积极学习<br>B) 视而不见<br>C) 随意破坏`;
+                        showQuizPreview(topic, mockQ);
+                    }
                 } 
             }); 
         };
 
-        // --- 🌟 绝杀功能 2：教师上传材料 AI 分析互动 ---
+        function showQuizPreview(topic, questionsHTML) {
+            Swal.fire({
+                title: '📝 题目预览与编辑',
+                html: `
+                    <div class="text-left text-sm space-y-3 mt-4 max-h-60 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="font-bold text-slate-700 mb-2">生成主题: ${topic}</div>
+                        <div class="text-slate-800 leading-relaxed text-base" contenteditable="true" style="outline: none; padding: 12px; background: white; border-radius: 8px; border: 1.5px dashed #94a3b8; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                            ${questionsHTML}
+                        </div>
+                        <div class="text-xs text-indigo-500 text-center mt-3 font-bold">* 老师，您可以直接在上方白框内点击并修改文字内容。</div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '✅ 确认无误，下发给全班',
+                cancelButtonText: '重新生成',
+                confirmButtonColor: '#10b981',
+                width: '600px'
+            }).then((reviewRes) => {
+                if (reviewRes.isConfirmed) {
+                    Swal.fire('发布成功！', '题目已实时推送到全班学生的手机终端，学生完成将获得奖励！', 'success'); 
+                } else if (reviewRes.dismiss === Swal.DismissReason.cancel) {
+                    window.generateAIQuiz(); 
+                }
+            });
+        }
+
+        // --- 🌟 真实的上传文件交互模拟 ---
         window.mockUploadMaterial = () => {
             Swal.fire({
                 title: '上传教学材料',
-                html: '<div class="border-2 border-dashed border-indigo-300 rounded-2xl p-8 bg-indigo-50 text-indigo-500 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100 transition-colors" id="mock-upload-zone"><div class="text-5xl mb-3">📁</div><div class="font-bold text-lg">点击选择文件 或 拖拽到此处</div><span class="text-xs text-indigo-400">支持 PDF, Word, PPT 或 图片格式</span></div>',
+                html: `
+                    <input type="file" id="real-file-input" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*">
+                    <div class="border-2 border-dashed border-indigo-300 rounded-2xl p-8 bg-indigo-50 text-indigo-500 cursor-pointer hover:border-indigo-500 hover:bg-indigo-100 transition-colors" onclick="document.getElementById('real-file-input').click()">
+                        <div class="text-5xl mb-3">📁</div>
+                        <div class="font-bold text-lg" id="upload-text">点击此处选择文件</div>
+                        <span class="text-xs text-indigo-400 mt-2 block">支持 PDF, Word, PPT 或 图片格式</span>
+                    </div>
+                `,
                 showConfirmButton: false, showCancelButton: true, cancelButtonText: '取消',
                 didOpen: () => {
-                    document.getElementById('mock-upload-zone').addEventListener('click', () => {
-                        Swal.fire({ title: 'AI 深度分析中...', html: '正在阅读材料并提取核心考点', timer: 2500, timerProgressBar: true, didOpen: () => Swal.showLoading() }).then(() => {
-                            Swal.fire({
-                                title: '✨ 分析完成！',
-                                html: `
-                                    <p class="text-sm text-left mb-4 text-slate-600">PandAI 助手已从您的材料中成功提取了 <b class="text-indigo-600">12</b> 个核心生词和 <b class="text-purple-600">3</b> 个关键语法句型。</p>
-                                    <div class="flex flex-col gap-3">
-                                        <button onclick="Swal.clickConfirm(); setTimeout(generateAIQuiz, 300)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">👉 立刻根据材料生成随堂测验</button>
-                                        <button onclick="Swal.fire('课件已优化', 'AI 已为您补充了相关的趣味图片与精准拼音标注！', 'success')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">🌟 生成优化版课件 (附拼音解释)</button>
-                                    </div>
-                                `,
-                                showConfirmButton: false, showCancelButton: true, cancelButtonText: '关闭窗口'
-                            });
-                        });
+                    document.getElementById('real-file-input').addEventListener('change', function(e) {
+                        if(e.target.files.length > 0) {
+                            const fileName = e.target.files[0].name;
+                            document.getElementById('upload-text').innerText = "已选中: " + fileName;
+                            
+                            setTimeout(() => {
+                                Swal.fire({ title: 'AI 深度分析中...', html: `正在阅读 <b>${fileName}</b> 并提取核心考点`, timer: 2500, timerProgressBar: true, didOpen: () => Swal.showLoading() }).then(() => {
+                                    Swal.fire({
+                                        title: '✨ 分析完成！',
+                                        html: `
+                                            <p class="text-sm text-left mb-4 text-slate-600">PandAI 助手已从您的材料中成功提取了 <b class="text-indigo-600">12</b> 个核心生词和 <b class="text-purple-600">3</b> 个关键语法句型。</p>
+                                            <div class="flex flex-col gap-3">
+                                                <button onclick="Swal.clickConfirm(); setTimeout(generateAIQuiz, 300)" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">👉 立刻根据材料生成随堂测验</button>
+                                                <button onclick="Swal.fire('课件已优化', 'AI 已为您补充了相关的趣味图片与精准拼音标注！', 'success')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold shadow-md transition-all">🌟 生成优化版课件 (附拼音解释)</button>
+                                            </div>
+                                        `,
+                                        showConfirmButton: false, showCancelButton: true, cancelButtonText: '关闭窗口'
+                                    });
+                                });
+                            }, 500);
+                        }
                     });
                 }
             });
