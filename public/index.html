@@ -40,6 +40,8 @@
         .user-msg .bubble { background: #4f46e5; color: white; border-bottom-right-radius: 0.25rem; }
         
         #login-portal { backdrop-filter: blur(15px); background: rgba(255, 255, 255, 0.15); transition: opacity 0.5s ease; }
+        .role-btn { transition: all 0.2s; border: 2px solid transparent; background: rgba(255,255,255,0.8); }
+        .role-btn.selected { border-color: #4f46e5; background-color: #e0e7ff; color: #4f46e5; font-weight: bold; }
         
         .flashcard { perspective: 1000px; cursor: pointer; width: 100%; max-width: 320px; height: 350px; margin: 0 auto; }
         .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
@@ -113,7 +115,7 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- 🌟 语言切换选择器 (Bahasa Cina, Bahasa Melayu, English) -->
+                <!-- 🌟 语言切换选择器 -->
                 <select id="lang-selector" onchange="window.changeLang(this.value)" class="bg-white/90 border border-slate-200 text-slate-700 font-bold text-xs md:text-sm px-2 py-1.5 rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-indigo-300">
                     <option value="zh" selected>🌐 华文 (Bahasa Cina)</option>
                     <option value="ms">🌐 Bahasa Melayu</option>
@@ -153,7 +155,7 @@
                         <div class="flex flex-col items-center relative z-10 group">
                             <div class="bg-indigo-600 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full absolute -top-4 shadow-md z-20 transition-all group-hover:-translate-y-1" id="lbl-my-avatar">我的数字分身</div>
                             <div class="w-24 h-24 md:w-32 md:h-32 bg-indigo-50/80 border-4 border-white shadow-lg rounded-full overflow-hidden avatar-float transition-transform group-hover:scale-105 cursor-pointer" onclick="window.openAvatarBuilder()">
-                                <img id="student-avatar-img" src="https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=ffdbb4&top=shortHairShortFlat&clothing=hoodie" class="w-full h-full object-cover">
+                                <img id="student-avatar-img" src="https://api.dicebear.com/9.x/avataaars/svg?seed=fallback&backgroundColor=e0e7ff" class="w-full h-full object-cover">
                             </div>
                             <div class="w-16 h-3 bg-indigo-500/20 rounded-[100%] blur-[4px] mt-2 group-hover:bg-indigo-400/40 transition-all"></div>
                             <div class="flex gap-2 mt-2">
@@ -409,9 +411,21 @@
         </main>
     </div>
 
-    <!-- UI, 语言切换, 游戏, AI 响应逻辑 -->
+    <!-- 逻辑脚本区 -->
     <script>
-        // 🌟 语言配置表 (多语系脚手架支持)
+        // 🌟 题库数据与多语系修复
+        const langData = {
+            zh: { 
+                quiz: [
+                    { type: "词汇理解", diff: "基础题 🌱", xp: 10, q: "请选择以下词语的正确解释：\n\n城堡 (chéng bǎo)", opts: ["像城一样的坚固建筑", "巨大的石头", "浮在水面上的力量", "一种船的名称"], ans: 0, explain: "城堡是指像城一样的坚固建筑，比如日本的大阪城。" },
+                    { type: "语法填空", diff: "中等题 📘", xp: 20, q: "请选择正确的关联词填入句子中：\n\n大伙儿说：“______ 船载不了巨石，那 ______ 让巨石来载船吧！”", opts: ["虽然 / 但是", "因为 / 所以", "既然 / 就", "不但 / 而且"], ans: 2, explain: "“既然...就...” 用于表示先提出前提，而后引出在这个前提下会产生的结果或决定。" },
+                    { type: "课文理解", diff: "中等题 📘", xp: 20, q: "工匠们是如何解决巨石太重导致船只下沉的问题的？", opts: ["把巨石切成小块", "把巨石绑在船底下", "把巨石放在船的甲板上", "放弃运输巨石"], ans: 1, explain: "工匠们运用了逆向思考，把巨石绑在船底下（水中），利用水的浮力来减轻重量。" },
+                    { type: "多音多义字", diff: "中等题 📘", xp: 20, q: "请选择划线字的正确读音：\n\n大 阪 【堡】", opts: ["bǎo", "pù", "bǔ", "pāo"], ans: 0, explain: "在“城堡”这个词中，“堡”的读音是 bǎo。" },
+                    { type: "高层次思维 KBAT", diff: "挑战题 🧠", xp: 40, q: "用石头来“载”船，这是一种“逆向思考”（Pemikiran Terbalik）。以下哪一项也是在生活里运用了“逆向思考”？", opts: ["把地上的垃圾扫干净。", "因为冰淇淋容易融化弄脏手，所以发明了可以吃掉的“饼干甜筒”。", "考试不及格时大哭一场。", "下雨天撑伞出门。"], ans: 1, explain: "非常棒！逆向思考就是打破平常的习惯，从相反的方向去解决问题。甜筒的例子就是非常经典的逆向思考！" }
+                ]
+            }
+        };
+
         const i18n = {
             zh: {
                 nav: ['主页', '答题区', '排行榜', 'AI助手', '教师大屏'],
@@ -499,18 +513,28 @@
             }
 
             renderNav();
+            
+            // 如果在答题区，语言切换后重新加载题目以防止报错
+            const qView = document.getElementById('view-quiz');
+            if(qView && !qView.classList.contains('hidden')) loadQuestion();
         };
 
-        // 🌟 零延迟高顺畅 AI 响应机制（以华文为主体，兼顾 Malay/English 辅助）
+        // 🌟 头像生成逻辑修复[cite: 2]
+        window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHair', clothing: 'hoodie' };
+        window.getAvatarUrl = (config) => { 
+            // 采用最稳定的 seed 拼接法，无视旧 API 的参数限制错误
+            return `https://api.dicebear.com/9.x/avataaars/svg?seed=${config.skinColor}-${config.top}-${config.clothing}&backgroundColor=e0e7ff`; 
+        };
+        window.updateAvatarUI = () => { const img = document.getElementById('student-avatar-img'); if(img) img.src = window.getAvatarUrl(window.avatarConfig); };
+
+        // 🌟 零延迟高顺畅 AI 响应机制
         window.callGeminiAPI = async (prompt) => {
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // 出题模式
             if (prompt.includes("单选题") || prompt.includes("出题") || prompt.includes("测试") || prompt.includes("练习")) {
                 return `1. 《巨石载船》中，工匠们遇到了什么难题？\nA) 找不到适合筑城的巨石\nB) 巨石太重，导致船只沉入水底 (Batu terlalu berat)\nC) 大阪城被大火毁坏了\n\n2. 工匠们最后采用什么方法将巨石运到大阪？\nA) 把巨石切成小块放在船上\nB) 把巨石捆在船底，利用浮力运输 (Ikat batu di bawah kapal)\nC) 建造更大的铁船来搬运`;
             }
 
-            // 食堂口语 Roleplay 模式
             if (prompt.includes("食堂") || prompt.includes("安娣") || prompt.includes("椰浆饭") || prompt.includes("饭") || prompt.includes("面")) {
                 if (prompt.includes("椰浆饭") || prompt.includes("nasi lemak")) {
                     return `Wah, Pandai! 好的，马上给你拿一份香喷喷的椰浆饭！要不要加鸡蛋？小孩子吃多一点才有精神学习！\n(BM: Baik, makcik sediakan sepinggan Nasi Lemak yang harum! Nak tambah telur tak?)`;
@@ -518,7 +542,6 @@
                 return `Anak murid, 好的！你要的食物准备好了！拿好哦，小心烫。一共是 2 令吉。\n(BM: Baik murid, makanan yang kamu pesan dah siap! Pegang elok-elok ya. Semuanya RM2.)`;
             }
 
-            // 华文课文问答
             if (prompt.includes("巨石") || prompt.includes("载船") || prompt.includes("逆向思考")) {
                 return `这是因为巧妙地应用了“浮力”（Daya Apungan）与“逆向思考”（Pemikiran Terbalik）！当“船载不动巨石”时，换个角度想“让巨石来载船”，把巨石捆在船底，问题就迎刃而解了！`;
             }
@@ -584,15 +607,11 @@
             }
         };
 
-        window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' };
-        window.getAvatarUrl = (config) => { return `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${config.skinColor}&top=${config.top}&clothing=${config.clothing}`; };
-        window.updateAvatarUI = () => { const img = document.getElementById('student-avatar-img'); if(img) img.src = window.getAvatarUrl(window.avatarConfig); };
-
         window.openAvatarBuilder = () => {
             let tempConfig = Object.assign({}, window.avatarConfig); playSound('click');
             const skins = [{ val: 'ffdbb4', label: '白皙' }, { val: 'edb98a', label: '自然' }, { val: 'd08b5b', label: '小麦' }, { val: 'ae5d29', label: '深色' }];
-            const tops = [{ val: 'shortHairShortFlat', label: '短发' }, { val: 'shortHairShortCurly', label: '卷发' }, { val: 'longHairStraight', label: '长发' }, { val: 'longHairBob', label: '波波头' }];
-            const clothes = [{ val: 'hoodie', label: '连帽衫' }, { val: 'blazerAndShirt', label: '校服' }, { val: 'graphicShirt', label: 'T恤' }];
+            const tops = [{ val: 'shortHair', label: '短发' }, { val: 'curly', label: '卷发' }, { val: 'longHair', label: '长发' }, { val: 'bob', label: '波波头' }];
+            const clothes = [{ val: 'hoodie', label: '连帽衫' }, { val: 'blazer', label: '校服' }, { val: 'shirt', label: 'T恤' }];
 
             const renderBtns = (key, arr) => {
                 return arr.map(item => {
@@ -739,10 +758,13 @@
             if(viewId === 'flashcard') loadFlashcard();
         };
 
+        // 🌟 修复答题区加载逻辑[cite: 3]
         function startQuiz() { currentQ = 0; gameScore = 0; document.getElementById('game-score').innerText = gameScore; loadQuestion(); }
         
         function loadQuestion() {
-            const t = langData.zh; const qData = t.quiz;
+            // 直接引用修复后的题库数据，防止 undefined 报错
+            const qData = langData.zh.quiz;
+            
             if (currentQ >= qData.length) {
                 document.getElementById('q-type-label').innerText = "✅ 恭喜！关卡完成！";
                 document.getElementById('game-question').innerHTML = `<span class="text-indigo-600 font-bold drop-shadow-sm">第 19 课任务顺利通关！<br>今天共获得 ${gameScore} XP 与 ${Math.floor(gameScore/2)} 金币 💰！🎉</span>`; 
@@ -757,11 +779,11 @@
             else { diffBadge.className = "text-xs font-bold px-2 py-1 rounded bg-purple-100 text-purple-700 border border-purple-200"; }
             const xpBadge = document.getElementById('q-xp-badge'); xpBadge.style.display = 'inline-block'; xpBadge.innerText = `⭐ +${currentItem.xp} XP`;
             document.getElementById('q-type-label').innerText = `📌 ${currentItem.type}`;
-            document.getElementById('game-options').innerHTML = currentItem.opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md border-slate-300" onclick="checkAnswer(${idx}, this)"><span class="inline-block w-6 h-6 text-center rounded-full bg-slate-100 text-slate-500 mr-2 text-sm leading-6 border border-slate-200">${String.fromCharCode(65+idx)}</span> ${opt}</button>`).join('');
+            document.getElementById('game-options').innerHTML = currentItem.opts.map((opt, idx) => `<button class="quiz-btn shadow-sm hover:shadow-md border-slate-300" onclick="window.checkAnswer(${idx}, this)"><span class="inline-block w-6 h-6 text-center rounded-full bg-slate-100 text-slate-500 mr-2 text-sm leading-6 border border-slate-200">${String.fromCharCode(65+idx)}</span> ${opt}</button>`).join('');
         }
 
         window.checkAnswer = (selectedIdx, btn) => {
-            const t = langData.zh; const qData = t.quiz; const currentItem = qData[currentQ]; const isCorrect = selectedIdx === currentItem.ans; 
+            const qData = langData.zh.quiz; const currentItem = qData[currentQ]; const isCorrect = selectedIdx === currentItem.ans; 
             document.querySelectorAll('#game-options .quiz-btn').forEach(b => b.disabled = true);
             if (isCorrect) { 
                 btn.classList.add('correct'); playSound('correct'); gameScore += currentItem.xp; document.getElementById('game-score').innerText = gameScore; gainXP(currentItem.xp); 
@@ -858,7 +880,7 @@
             const data = { labels: ['阅读理解', '口语表达', '识字朗读', '书写笔画', '词汇积累', '语法运用'], datasets: [{ label: '班级华文平均水平', data: [85, 70, 90, 75, 88, 65], fill: true, backgroundColor: 'rgba(79, 70, 229, 0.2)', borderColor: 'rgb(79, 70, 229)', pointBackgroundColor: 'rgb(79, 70, 229)', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: 'rgb(79, 70, 229)' }] };
             radarChartInstance = new Chart(ctx, { type: 'radar', data: data, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
         }
-        window.onload = () => { changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
+        window.onload = () => { window.updateAvatarUI(); changeLang('zh'); document.body.addEventListener('click', () => { if(!isAudioInit) initAudio(); }, { once: true }); };
     </script>
 
     <!-- Firebase 云端数据逻辑 -->
@@ -906,7 +928,7 @@
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data(); if(data.role === 'teacher') return; 
                     const userXp = data.xp || 0; const userCoins = data.coins || 0; const sec = data.activeSeconds || 0; const mins = Math.floor(sec / 60); const remainSec = sec % 60; const timeStr = mins > 0 ? `${mins}m ${remainSec}s` : `${sec}s`; const userStreak = data.streak || 1;
-                    const avatarUrl = data.avatarConfig ? `https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=e0e7ff&skinColor=${data.avatarConfig.skinColor}&top=${data.avatarConfig.top}&clothing=${data.avatarConfig.clothing}` : `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}&backgroundColor=e0e7ff`;
+                    const avatarUrl = data.avatarConfig ? `https://api.dicebear.com/9.x/avataaars/svg?seed=${data.avatarConfig.skinColor}-${data.avatarConfig.top}-${data.avatarConfig.clothing}&backgroundColor=e0e7ff` : `https://api.dicebear.com/9.x/avataaars/svg?seed=${data.name}&backgroundColor=e0e7ff`;
 
                     let medal = `<span class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-md text-xs border border-white z-20">${rank}</span>`;
                     if(rank === 1) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥇</span>`; if(rank === 2) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥈</span>`; if(rank === 3) medal = `<span class="absolute -top-3 -left-3 text-2xl drop-shadow-md z-20">🥉</span>`;
@@ -984,10 +1006,12 @@
                     const data = docSnap.data();
                     if(data.role) role = data.role; if(data.name) name = data.name; if(data.xp) userXp = data.xp; if(data.coins) userCoins = data.coins;
                     if(data.avatarConfig) { window.avatarConfig = data.avatarConfig; }
-                    else { window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHairShortFlat', clothing: 'hoodie' }; }
+                    else { window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHair', clothing: 'hoodie' }; }
                     
                     const todayDateStr = new Date().toDateString(); streak = data.streak || 1; const lastLogin = data.lastLoginDate || "";
                     if (lastLogin !== todayDateStr) { streak = lastLogin === "" ? 1 : streak + 1; await updateDoc(doc(db, "users", user.uid), { lastLoginDate: todayDateStr, streak: streak }).catch(e => console.log(e)); }
+                } else {
+                    window.avatarConfig = { skinColor: 'ffdbb4', top: 'shortHair', clothing: 'hoodie' };
                 }
                 
                 document.getElementById('user-streak').innerText = `🔥 ${streak}`;
